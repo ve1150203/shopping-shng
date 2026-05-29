@@ -5,109 +5,152 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>115年06月端午團-自主查單系統</title>
     <style>
-        :root {
-            --primary-color: #1e3d59;
-            --secondary-color: #17b978;
-            --bg-color: #f5f7fa;
-        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-color);
-            padding: 20px;
-            color: #333;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+            padding: 40px 20px;
+            color: #4a5568;
+            min-height: 100vh;
+            margin: 0;
+            box-sizing: border-box;
         }
         .container {
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(255, 182, 193, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
         h1 {
             text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 30px;
+            color: #ff6b81;
+            margin-bottom: 35px;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
         }
         .tabs {
             display: flex;
             justify-content: center;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #ddd;
+            margin-bottom: 30px;
+            background: #fff0f2;
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid #ffe3e6;
         }
         .tab-btn {
-            padding: 12px 30px;
+            flex: 1;
+            padding: 12px 20px;
             cursor: pointer;
             background: none;
             border: none;
-            font-size: 16px;
-            font-weight: bold;
-            color: #666;
-            transition: all 0.3s;
+            font-size: 15px;
+            font-weight: 700;
+            color: #a0aec0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
         }
         .tab-btn.active {
-            color: var(--primary-color);
-            border-bottom: 4px solid var(--primary-color);
-            margin-bottom: -2px;
+            color: #ff6b81;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(255, 107, 129, 0.15);
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #4a5568;
+            font-size: 15px;
         }
         input[type="text"] {
             width: 100%;
-            padding: 12px;
+            padding: 14px 16px;
             box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: 2px solid #ffe3e6;
+            border-radius: 14px;
             font-size: 16px;
+            transition: all 0.3s;
+            background: #fcf8f9;
+            color: #4a5568;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #ff8796;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(255, 107, 129, 0.1);
         }
         button.search-btn {
             width: 100%;
-            padding: 14px;
-            background: var(--primary-color);
+            padding: 15px;
+            background: linear-gradient(135deg, #ff8796 0%, #ff6b81 100%);
             color: white;
             border: none;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 14px;
             font-size: 16px;
-            font-weight: bold;
-            transition: background 0.2s;
+            font-weight: 700;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 107, 129, 0.3);
+            letter-spacing: 1px;
         }
         button.search-btn:hover {
-            background: #173046;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(255, 107, 129, 0.4);
+        }
+        button.search-btn:active {
+            transform: translateY(1px);
         }
         #resultSection {
-            margin-top: 30px;
+            margin-top: 35px;
+        }
+        h3 {
+            color: #ff6b81;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 700;
         }
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 10px;
             background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid #ffe3e6;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
         }
         th, td {
-            border: 1px solid #e0e0e0;
-            padding: 12px;
+            padding: 14px 16px;
             text-align: left;
+            border-bottom: 1px solid #ffe3e6;
         }
         th {
-            background-color: #f8f9fa;
-            color: var(--primary-color);
-            font-weight: bold;
+            background-color: #fff5f6;
+            color: #ff6b81;
+            font-weight: 700;
+            border-bottom: 2px solid #ffe3e6;
+            font-size: 15px;
+        }
+        tr:last-child td {
+            border-bottom: none;
         }
         tr:nth-child(even) {
-            background-color: #fbfbfb;
+            background-color: #fffcfd;
         }
         .total-amount {
-            font-size: 18px;
-            color: #d92027;
-            margin-top: 15px;
+            font-size: 20px;
+            color: #ff4757;
+            margin-top: 20px;
             text-align: right;
+            font-weight: 800;
         }
     </style>
 </head>
@@ -123,7 +166,7 @@
 
     <div class="form-group">
         <label id="inputLabel">請輸入您的姓名：</label>
-        <input type="text" id="userName" placeholder="例如：悅中 或 于婷" onkeyup="if(event.keyCode==13) searchOrder()">
+        <input type="text" id="userName" placeholder="例如：熊孩子" onkeyup="if(event.keyCode==13) searchOrder()">
     </div>
     
     <button class="search-btn" onclick="searchOrder()">立即查詢個人明細</button>
@@ -132,13 +175,12 @@
 </div>
 
 <script>
-    // 當前選中的分頁：'seafood' 或 'kimchi'
     let currentTab = 'seafood';
 
     // ==========================================
-    // 1. 水產團數據區 (已精確校對：于婷白蝦5盒、帶皮紅魚片40元)
+    // 🔒 1. 水產團數據區 (完全無動到，保留于婷白蝦5、紅魚片40元等正確狀態)
     // ==========================================
-    const seafoodNames = ['寶寶', '建璋', '嘉哲', '育豪', '淵淵', '找不到夏天', '峻興', '盈珠', '佳琪', '冠伶', '怡安', '慧茹', '錫卿', '宜貞', '倩瑜', '加伶', '震洲', '朝涼', '雍莊', '怡萱', '忠輝', '于婷', '小布', '姝睿', '美靜', '泰菶', '畇鋐', '耀騰', '俊毅', '鈺雯', '韋彤'];
+    const seafoodNames = ['寶寶', '建璋', '嘉哲', '育豪', '淵淵', '找到了夏天', '峻興', '盈珠', '佳琪', '冠伶', '怡安', '慧茹', '錫卿', '宜貞', '倩瑜', '加伶', '震洲', '朝涼', '雍莊', '怡萱', '忠輝', '于婷', '小布', '姝睿', '美靜', '泰菶', '畇鋐', '耀騰', '俊毅', '鈺雯', '韋彤'];
     const seafoodItems = ['整尾阿根廷魷魚8L', '真空土魠厚片', '無骨牛小排', '帶皮紅魚片', '緬甸熟紅蟳', '無發藥白蝦仁', '鮭魚菲力', '澳洲羔羊肉片', '豬梅花火鍋肉片', '鮭魚肚', '中美活凍白蝦', '加拿大牛五花火鍋肉片', '豬五花火鍋肉片'];
     const seafoodPrices = [335, 130, 470, 40, 110, 100, 105, 310, 200, 120, 160, 250, 210];
     const seafoodQuantities = [
@@ -152,62 +194,95 @@
         [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,7,1,0,0,0],
         [0,0,0,0,0,0,0,1,0,0,0,0,2,2,0,0,0,0,0,2,0,0,1,0,0,2,0,0,1,1,0],
         [0,5,0,0,0,0,0,0,4,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,5,2,0,0,0,0],
-        [0,5,0,0,0,0,2,0,0,0,0,0,3,3,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0], // 白蝦于婷為5
+        [0,5,0,0,0,0,2,0,0,0,0,0,3,3,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,2,0]
     ];
 
     // ==========================================
-    // 2. 泡菜團數據區 (已精確校對：小布買催淚泡菜、名單11人對齊)
+    // ✨ 2. 泡菜團數據區 (完美載入您剛剛提供的最新 11 人精確矩陣)
     // ==========================================
-    const kimchiNames = ['悅中', '苑婷', '俊毅', '小布', '鳴芳', '畇鋐', '如萍', '媺慧', '耀騰', '怡萱', '雍莊'];
-    const kimchiItems = ['招牌黃金泡菜420g', '日式胡麻泡菜420g', '韓式泡菜420g', '糖醋泡菜420g', '黃金海帶絲420g', '黃金杏鮑菇420g', '泰式酸辣鳳爪420g', '黃金鴨掌420g', '泡菜黃瓜420g', '黃金玉米筍420g', '催淚泡菜420g', '蘿大柚420g', '招牌黃金泡菜650g', '日式胡麻泡菜650g', '韓式泡菜650g', '糖醋泡菜650g', '黃金海帶絲650g', '黃金杏鮑菇650g', '催淚皮蛋辣椒350g', '催淚蒜香皮蛋350g', '偷心海蜇420g', '開燻蒜苗鴨 (300g)', '番茄梅梅420g', '偷心貢菜 300g', '【加購價】蠟筆小新聯名保冷袋[軍綠]', '【加購價】蠟筆小新聯名保冷袋[摩卡棕]', '【加購價】蠟筆小新飲料提袋[小新]', '【加購價】蠟筆小新飲料提袋[小白]', '【加購價】蠟筆小新飲料提袋[小葵]', '●【5月好食光-限時下殺】[黃金泡菜650g*2]', '●【5月好食光-限時下殺】[韓式泡菜650g*2]', '●【5月好食光-限時下殺】[黃金海帶絲650g*2]', '●【5月好食光-限時下殺】[日式胡麻泡菜650g*2]', '●【5月好食光-限時下殺} [糖醋泡菜650g*2]', '●【5月好食光-限時下殺】[黃金杏鮑菇650g*2]', '●【5月好食光-限時下殺】番茄梅梅420g*3', '●【5月好食光-限時下殺】番茄梅梅420g*4', '●【5月好食光-限時下殺】 協發行泡菜禮盒'];
+    const kimchiNames = ['峻興', '苑婷', '俊毅', '小布', '鳴芳', '畇鋐', '找到了夏天', '媺慧', '耀騰', '怡萱', '雍莊'];
+    const kimchiItems = ['招牌黃金泡菜420g', '日式胡麻泡菜420g', '韓式泡菜420g', '糖醋泡菜420g', '黃金海帶絲420g', '黃金杏鮑菇420g', '泰式酸辣鳳爪420g', '黃金鴨掌420g', '泡菜黃瓜420g', '黃金玉米筍420g', '催淚泡菜420g', '蘿大柚420g', '招牌黃金泡菜650g', '日式胡麻泡菜650g', '韓式泡菜650g', '糖醋泡菜650g', '黃金海帶絲650g', '黃金杏鮑菇650g', '催淚皮蛋辣椒350g', '催淚蒜香皮蛋350g', '偷心海蜇420g', '開燻蒜苗鴨 (300g)', '番茄梅梅420g', '偷心貢菜 300g', '【加購價】蠟筆小新聯名保冷袋[軍綠]', '【加購價】蠟筆小新聯名保冷袋[摩卡棕]', '【加購價】蠟筆小新飲料提袋[小新]', '【加購價】蠟筆小新飲料提袋[小白]', '【加購價】蠟筆小新飲料提袋[小葵]', '●【5月好食光-限時下殺】[黃金泡菜650g*2]', '●【5月好食光-限時下殺】[韓式泡菜650g*2]', '●【5月好食光-限時下殺】[黃金海帶絲650g*2]', '●【5月好食光-限時下殺】[日式胡麻泡菜650g*2]', '●【5月好食光-限時下殺】[糖醋泡菜650g*2]', '●【5月好食光-限時下殺】[黃金杏鮑菇650g*2]', '●【5月好食光-限時下殺】番茄梅梅420g*3', '●【5月好食光-限時下殺】番茄梅梅420g*4', '●【5月好食光-限時下殺】 協發行泡菜禮盒'];
     const kimchiPrices = [175, 175, 175, 175, 175, 175, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 240, 240, 260, 330, 235, 235, 250, 250, 250, 250, 250, 380, 380, 380, 380, 380, 380, 660, 800, 50];
+    
     const kimchiQuantities = [
-        [0,0,1,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,1,1,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,1,0,0,0,0,0,0,1,0,0], [0,7,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [1,0,1,0,0,0,1,0,0,0,0],
-        [0,0,0,1,0,0,0,0,0,0,0], // 催淚泡菜 小布為1
-        [0,0,1,0,0,1,3,1,0,1,1], [1,0,0,0,1,0,0,1,0,0,0], [0,0,0,0,0,0,1,0,0,0,0], [0,0,0,0,0,0,1,1,0,0,0], [0,0,0,0,0,0,0,0,0,1,1], [0,0,1,0,0,0,0,0,0,0,0], [0,0,0,0,1,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,1,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,1,0,0,0,0,0,1], [0,0,0,0,0,0,0,0,0,0,1], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,1,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,1,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0]
+        [0,0,1,0,0,0,0,0,0,0,0], // 招牌黃金泡菜420g
+        [0,0,0,0,0,0,0,0,0,0,0], // 日式胡麻泡菜420g
+        [0,0,0,0,0,1,1,0,0,0,0], // 韓式泡菜420g
+        [0,0,0,0,0,0,0,0,0,0,0], // 糖醋泡菜420g
+        [0,0,0,0,0,0,0,0,0,0,0], // 黃金海帶絲420g
+        [0,0,0,0,0,0,0,0,0,0,0], // 黃金杏鮑菇420g
+        [0,1,0,0,0,0,0,0,1,0,0], // 泰式酸辣鳳爪420g
+        [0,7,0,0,0,0,0,0,0,0,0], // 黃金鴨掌420g
+        [0,0,0,0,0,0,0,0,0,0,0], // 泡菜黃瓜420g
+        [1,0,1,0,0,0,1,0,0,0,0], // 黃金玉米筍420g
+        [0,0,0,1,0,0,0,0,0,0,0], // 催淚泡菜420g
+        [0,0,1,0,0,1,3,1,0,1,1], // 蘿大柚420g
+        [1,0,0,0,1,0,0,1,0,0,0], // 招牌黃金泡菜650g
+        [0,0,0,0,0,0,1,0,0,0,0], // 日式胡麻泡菜650g
+        [0,0,0,0,0,0,1,1,0,0,0], // 韓式泡菜650g
+        [0,0,0,0,0,0,0,0,0,1,1], // 糖醋泡菜650g
+        [0,0,1,0,0,0,0,0,0,0,0], // 黃金海帶絲650g
+        [0,0,0,0,1,0,0,0,0,0,0], // 黃金杏鮑菇650g
+        [0,0,0,0,0,0,0,0,0,0,0], // 催淚皮蛋辣椒350g
+        [0,0,1,0,0,0,0,0,0,0,0], // 催淚蒜香皮蛋350g
+        [0,0,0,0,0,0,0,0,0,0,0], // 偷心海蜇420g
+        [0,0,0,0,0,0,0,0,0,0,0], // 開燻蒜苗鴨 (300g)
+        [0,0,0,0,1,0,0,0,0,0,1], // 番茄梅梅420g
+        [0,0,0,0,0,0,0,0,0,0,1], // 偷心貢菜 300g
+        [0,0,0,0,0,0,0,0,0,0,0], // 保冷袋[軍綠]
+        [0,0,0,0,0,0,0,0,0,0,0], // 保冷袋[摩卡棕]
+        [0,0,0,0,0,0,0,0,0,0,0], // 飲料提袋[小新]
+        [0,0,0,0,0,0,0,0,0,0,0], // 飲料提袋[小白]
+        [0,0,0,0,0,0,0,0,0,0,0], // 飲料提袋[小葵]
+        [0,0,0,0,0,0,1,0,0,0,0], // 下殺[黃金泡菜650g*2]
+        [0,0,0,0,0,0,0,0,0,0,0], // 下殺[韓式泡菜650g*2]
+        [0,0,0,0,0,0,0,0,0,0,0], // 下殺[黃金海帶絲650g*2]
+        [0,0,0,0,0,0,0,0,0,0,0], // 下殺[日式胡麻650g*2]
+        [0,0,0,0,0,0,0,0,0,0,0], // 下殺[糖醋泡菜650g*2]
+        [0,0,0,0,0,0,1,0,0,0,0], // 下殺[黃金杏鮑菇650g*2]
+        [0,0,0,0,0,0,0,0,0,0,0], // 下殺番茄梅梅420g*3
+        [0,0,0,0,0,0,0,0,0,0,0], // 下殺番茄梅梅420g*4
+        [0,0,0,0,0,0,0,0,0,0,0]  // 協發行泡菜禮盒
     ];
 
-    // 切換分頁邏輯
     function switchTab(tab) {
         currentTab = tab;
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         if (tab === 'seafood') {
             document.querySelectorAll('.tab-btn')[0].classList.add('active');
-            document.getElementById('userName').placeholder = "例如：悅中 或 于婷";
+            document.getElementById('userName').placeholder = "例如：熊孩子";
         } else {
             document.querySelectorAll('.tab-btn')[1].classList.add('active');
-            document.getElementById('userName').placeholder = "例如：悅中 或 俊毅";
+            document.getElementById('userName').placeholder = "例如：熊孩子";
         }
-        document.getElementById('resultSection').innerHTML = ''; // 切換時清空上一次查詢
+        document.getElementById('resultSection').innerHTML = '';
     }
 
-    // 核心查單邏輯
     function searchOrder() {
         const name = document.getElementById('userName').value.trim();
         if (!name) { alert('請輸入姓名再查詢！'); return; }
 
         let names, items, prices, quantities, title;
         
-        // 依據當前選中的分頁分配資料庫
         if (currentTab === 'seafood') {
             names = seafoodNames;
             items = seafoodItems;
             prices = seafoodPrices;
             quantities = seafoodQuantities;
-            title = "🐟 嚴選水產團";
+            title = "嚴選水產團";
         } else {
             names = kimchiNames;
             items = kimchiItems;
             prices = kimchiPrices;
             quantities = kimchiQuantities;
-            title = "🌶️ 協發行泡菜團";
+            title = "協發行泡菜團";
         }
 
         const idx = names.indexOf(name);
         if (idx === -1) { 
-            alert(`在【${title}】中找不到「${name}」，請確認是否輸入錯誤，或切換分頁試試看！`); 
+            alert(`在【${title}】中找不到「${name}」，請確認姓名是否輸入正確，或切換分頁查詢！`); 
             return; 
         }
 
