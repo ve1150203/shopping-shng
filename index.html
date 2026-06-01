@@ -500,7 +500,7 @@ function buildInvoiceHTML(type, name) {
     const boxClass = isPaid ? 'invoice-box paid-style' : 'invoice-box';
     const badgeText = isPaid ? '✅ 已付款' : '❌ 未付款';
     const badgeClass = isPaid ? 'payment-badge badge-paid' : 'payment-badge badge-unpaid';
-    const titleText = type === 'seafood' ? '⚓ 水產（樂客）- 個人出貨明細單' : '🌶️ 協發行泡菜 - 個人出貨明細單';
+    const titleText = type === 'seafood' ? '⚓ 水產（樂客）- 個人明細單' : '🌶️ 協發行泡菜 - 個人明細單';
 
     return `
     <div class="invoice-wrapper">
