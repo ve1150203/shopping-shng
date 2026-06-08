@@ -179,7 +179,6 @@
             padding: 4px 10px;
             border-radius: 50px;
             font-size: 13px;
-            cursor: pointer;
             user-select: none;
             font-weight: bold;
         }
@@ -355,8 +354,6 @@
             <li style="list-style-type: none; margin-left: -20px; padding-left: 20px; background: #fff0f0; border-radius: 4px; padding: 6px 10px; border: 1px dashed #feb7b7; color: #b71c1c;">
                 ⚠️ <b>重要通知：</b>因塑膠袋缺貨，<b>請務必自備保冷袋</b>（保冷袋最好自己備註上姓名）。到貨清點數量之後會在群組公佈，請當時若有空的同仁盡速來取貨。感謝！
             </li>
-
-
         </ul>
     </div>
     
@@ -364,7 +361,7 @@
         <div class="form-group">
             <label>1. 請勾選要查詢的團購種類（可複選）：</label>
             <div class="checkbox-group">
-                <label class="checkbox-label"><input type="checkbox" id="chkSeafood" checked> 水產（樂客）</label>
+                <label class="checkbox-label"><input type="checkbox" id="chkSeafood" checked disabled> 水產（樂客）</label>
                 <label class="checkbox-label" style="color: #a0aec0; cursor: not-allowed;">
                     <input type="checkbox" id="chkKimchi" disabled> 協發行泡菜 (🚫活動已結束)
                 </label>
@@ -382,19 +379,22 @@
     <div class="admin-card">
         <label style="color:#2b6cb0; font-size:16px;">🛠️ 批次列印對帳 </label>
         <p style="margin: 5px 0 12px 0; font-size:13px; color:#4a5568;">點擊按鈕即可匯出出貨單。</p>
-        <div class="form-group">
+        <div class="form-group" style="display:none;">
             <div class="checkbox-group">
                 <label class="checkbox-label"><input type="checkbox" id="admSeafood" checked> 包含 水產團名單</label>
-                <label class="checkbox-label"><input type="checkbox" id="admKimchi" checked> 包含 泡菜團名單</label>
+                <label class="checkbox-label"><input type="checkbox" id="admKimchi"> 包含 泡菜團名單</label>
             </div>
         </div>
-        <button class="admin-btn" onclick="printAllOrders()">產生全團出貨單（需管理員密碼）</button>
+        <button class="admin-btn" onclick="printAllOrders()">產生水產團全團出貨單</button>
     </div>
 
     <div id="resultSection" style="display:none;"></div>
 </div>
 
 <script>
+// 💰 已付款名單數據庫：直接寫死，不論手機還是電腦看，狀態絕對永久統一！
+const paidSeafoodList = ['俊毅', '冠伶', '寶寶', '建璋', '忠輝', '怡萱', '找到了夏天', '畇鋐', '耀騰', '錫卿', '韋彤'];
+
 const seafoodNames = ['寶寶', '建璋', '嘉哲', '育豪', '淵淵', '找到了夏天', '峻興', '盈珠', '佳琪', '冠伶', '怡安', '慧茹', '錫卿', '宜貞', '倩瑜', '加伶', '震洲', '朝涼', '雍莊', '怡萱', '忠輝', '于婷', '小布', '姝睿', '美靜', '泰菶', '畇鋐', '耀騰', '俊毅', '鈺雯', '韋彤'];
 
 const seafoodItems = ['整尾阿根廷魷魚8L', '真空土魠厚片', '無骨牛小排', '帶皮紅魚片', '緬甸熟紅蟳', '無發藥白蝦仁', '鮭魚菲力', '澳洲羔羊肉片', '豬梅花火鍋肉片', '鮭魚肚', '中美活凍白蝦', '加拿大牛五花火鍋肉片', '豬五花火鍋肉片'];
@@ -417,12 +417,10 @@ const seafoodQuantities = [
     [0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,2,0]  // 豬五花
 ];
 
+// 泡菜原始數據保留備份（前台不會跑）
 const kimchiNames = ['峻興', '苑婷', '俊毅', '小布', '鳴芳', '畇鋐', '找到了夏天', '媺慧', '耀騰', '怡萱', '雍莊'];
-
 const kimchiItems = ['招牌黃金泡菜420g', '日式胡麻泡菜420g', '韓式泡菜420g', '糖醋泡菜420g', '黃金海帶絲420g', '黃金杏鮑菇420g', '泰式酸辣鳳爪420g', '黃金鴨掌420g', '泡菜黃瓜420g', '黃金玉米筍420g', '催淚泡菜420g', '蘿大柚420g', '招牌黃金泡菜650g', '日式胡麻泡菜650g', '韓式泡菜650g', '糖醋泡菜650g', '黃金海帶絲650g', '黃金杏鮑菇650g', '催淚皮蛋辣椒350g', '催淚蒜香皮蛋350g', '偷心海蜇420g', '開燻蒜苗鴨 (300g)', '番茄梅梅420g', '偷心貢菜 300g', '【加購價】蠟筆小新聯名保冷袋[軍綠]', '【加購價】蠟筆小新聯名保冷袋[摩卡棕]', '【加購價】蠟筆小新飲料提袋[小新]', '【加購價】蠟筆小新飲料提袋[小白]', '【加購價】蠟筆小新飲料提袋[小葵]', '●【5月好食光-限時下殺】[黃金泡菜650g*2]', '●【5月好食光-限時下殺】[韓式泡菜650g*2]', '●【5月好食光-限時下殺】[黃金海帶絲650g*2]', '●【5月好食光-限時下殺】[日式胡麻泡菜650g*2]', '●【5月好食光-限時下殺} [糖醋泡菜650g*2]', '●【5月好食光-限時下殺】[黃金杏鮑菇650g*2]', '●【5月好食光-限時下殺】番茄梅梅420g*3', '●【5月好食光-限時下殺】番茄梅梅420g*4', '●【5月好食光-限時下殺】 協發行泡菜禮盒'];
-
 const kimchiPrices = [175, 175, 175, 175, 175, 175, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 240, 240, 260, 330, 235, 235, 250, 250, 250, 250, 250, 380, 380, 380, 380, 380, 380, 660, 800, 50];
-
 const kimchiQuantities = [
     [0,0,1,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,1,1,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,1,0,0,0,0,0,0,1,0,0], [0,7,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [1,0,1,0,0,0,1,0,0,0,0], [0,0,0,1,0,0,0,0,0,0,0], [0,0,1,0,0,1,3,1,0,1,1], [1,0,0,0,1,0,0,1,0,0,0], [0,0,0,0,0,0,1,0,0,0,0], [0,0,0,0,0,0,1,1,0,0,0], [0,0,0,0,0,0,0,0,0,1,1], [0,0,1,0,0,0,0,0,0,0,0], [0,0,0,0,1,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,1,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,1,0,0,0,0,0,1], [0,0,0,0,0,0,0,0,0,0,1], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,1,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,1,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0]
 ];
@@ -430,16 +428,11 @@ const kimchiQuantities = [
 const ADMIN_CODE = "517175";
 
 function searchOrder() {
-    const showSeafood = document.getElementById('chkSeafood').checked;
-    // 前台鎖定，即便它在 HTML 中被選取（實際上已被 disabled 勾不到），這裡也強制排除泡菜
-    const showKimchi = false; 
+    const showSeafood = true; // 強制只查水產
     const name = document.getElementById('userName').value.trim();
-    if (!showSeafood) { alert('請勾選要查詢的團購種類！'); return; }
     if (!name) { alert('請輸入姓名！'); return; }
 
-    let boxesHTML = '';
-    if (showSeafood) boxesHTML += buildInvoiceHTML('seafood', name);
-
+    let boxesHTML = buildInvoiceHTML('seafood', name);
     renderOutput(boxesHTML, name);
 }
 
@@ -448,29 +441,24 @@ function printAllOrders() {
     if (codeInput === null) return;
     if (codeInput !== ADMIN_CODE) { alert("❌ 驗證碼錯誤！"); return; }
 
-    // 這裡已綁定正確的後台 id 屬性，點擊時不會再報錯
-    const runSeafood = document.getElementById('admSeafood').checked;
-    const runKimchi = document.getElementById('admKimchi').checked;
-    if (!runSeafood && !runKimchi) { alert('請至少勾選一個要列印的團！'); return; }
-
     let allNamesSet = new Set();
-    if (runSeafood) seafoodNames.forEach(n => allNamesSet.add(n));
-    if (runKimchi) kimchiNames.forEach(n => allNamesSet.add(n));
+    seafoodNames.forEach(n => allNamesSet.add(n));
     
     let boxesHTML = '';
     Array.from(allNamesSet).sort().forEach(name => {
-        if (runSeafood) boxesHTML += buildInvoiceHTML('seafood', name);
-        if (runKimchi) boxesHTML += buildInvoiceHTML('kimchi', name);
+        boxesHTML += buildInvoiceHTML('seafood', name);
     });
 
-    renderOutput(boxesHTML, "全團批次對帳單");
+    renderOutput(boxesHTML, "水產團批次對帳單");
 }
 
 function buildInvoiceHTML(type, name) {
-    let namesArr = type === 'seafood' ? seafoodNames : kimchiNames;
-    let pricesArr = type === 'seafood' ? seafoodPrices : kimchiPrices;
-    let itemsArr = type === 'seafood' ? seafoodItems : kimchiItems;
-    let qtyMatrix = type === 'seafood' ? seafoodQuantities : kimchiQuantities;
+    if (type !== 'seafood') return ''; // 徹底屏除泡菜
+
+    let namesArr = seafoodNames;
+    let pricesArr = seafoodPrices;
+    let itemsArr = seafoodItems;
+    let qtyMatrix = seafoodQuantities;
     
     const idx = namesArr.indexOf(name);
     if (idx === -1) return '';
@@ -486,23 +474,14 @@ function buildInvoiceHTML(type, name) {
         }
     }
 
-    if (type === 'kimchi' && name === '找不到夏天') {
-        rows += `<tr class="gift-row"><td>黃金鴨掌</td><td>0元</td><td>1</td><td>0元</td></tr>`;
-        rows += `<tr class="gift-row"><td>黃金泡菜420g</td><td>0元</td><td>1</td><td>0元</td></tr>`;
-        rows += `<tr class="gift-row"><td>蘿大柚420g</td><td>0元</td><td>1</td><td>0元</td></tr>`;
-        rows += `<tr class="gift-row"><td>黃金海帶絲420g</td><td>0元</td><td>1</td><td>0元</td></tr>`;
-        rows += `<tr class="gift-row"><td>泡菜黃瓜420g</td><td>0元</td><td>1</td><td>0元</td></tr>`;
-        rows += `<tr class="gift-row"><td>黃金泡菜650g</td><td>0元</td><td>2</td><td>0元</td></tr>`;
-        rows += `<tr class="gift-row"><td>黃金海帶絲650g</td><td>0元</td><td>2</td><td>0元</td></tr>`;
-    }
+    if (total === 0) return '';
 
-    if (total === 0 && !(type === 'kimchi' && name === '找不到夏天')) return '';
-
-    const isPaid = localStorage.getItem(`paid_${type}_${name}`) === 'true';
+    // 自動核對頂端名單：只要名字在 paidSeafoodList 裡，就一律顯示「已付款」
+    const isPaid = paidSeafoodList.includes(name);
     const boxClass = isPaid ? 'invoice-box paid-style' : 'invoice-box';
     const badgeText = isPaid ? '✅ 已付款' : '❌ 未付款';
     const badgeClass = isPaid ? 'payment-badge badge-paid' : 'payment-badge badge-unpaid';
-    const titleText = type === 'seafood' ? '⚓ 水產（樂客）- 個人出貨明細單' : '🌶️ 協發行泡菜 - 個人出貨明細單';
+    const titleText = '⚓ 水產（樂客）- 個人出貨明細單';
 
     return `
     <div class="invoice-wrapper">
@@ -513,7 +492,7 @@ function buildInvoiceHTML(type, name) {
             </div>
             <div class="user-info">
                 <div>團員姓名：<span style="color:var(--primary-color); font-size:17px;">${name}</span></div>
-                <span class="${badgeClass}" id="badge_${type}_${name}" onclick="togglePayment('${type}', '${name}')">${badgeText}</span>
+                <span class="${badgeClass}" id="badge_${type}_${name}">${badgeText}</span>
             </div>
             <table>
                 <thead><tr><th>品名規格</th><th>單價</th><th>數量</th><th>小計</th></tr></thead>
@@ -537,34 +516,6 @@ function renderOutput(htmlContent, title) {
         <div class="print-grid">${htmlContent}</div>`;
     }
     resultSection.style.display = 'block';
-}
-
-function togglePayment(type, name) {
-    const key = `paid_${type}_${name}`;
-    const currentStatus = localStorage.getItem(key) === 'true';
-    const codeInput = prompt("🔑 請輸入主控台驗證碼修改付款狀態：");
-    if (codeInput === null) return;
-    
-    if (codeInput === ADMIN_CODE) {
-        const newStatus = !currentStatus;
-        localStorage.setItem(key, newStatus);
-        
-        const box = document.getElementById(`box_${type}_${name}`);
-        const badge = document.getElementById(`badge_${type}_${name}`);
-        if (!box || !badge) return;
-        
-        if (newStatus) {
-            box.className = "invoice-box paid-style";
-            badge.className = "payment-badge badge-paid";
-            badge.innerText = "✅ 已付款";
-        } else {
-            box.className = "invoice-box";
-            badge.className = "payment-badge badge-unpaid";
-            badge.innerText = "❌ 未付款";
-        }
-    } else {
-        alert("❌ 驗證碼錯誤！");
-    }
 }
 </script>
 
