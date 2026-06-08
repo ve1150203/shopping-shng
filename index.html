@@ -355,8 +355,6 @@
             <li style="list-style-type: none; margin-left: -20px; padding-left: 20px; background: #fff0f0; border-radius: 4px; padding: 6px 10px; border: 1px dashed #feb7b7; color: #b71c1c;">
                 ⚠️ <b>重要通知：</b>因塑膠袋缺貨，<b>請務必自備保冷袋</b>（保冷袋最好自己備註上姓名）。到貨清點數量之後會在群組公佈，請當時若有空的同仁盡速來取貨。感謝！
             </li>
-            <li style="margin-top: 12px;">💰 <span class="highlight-text">泡菜團付款日：</span><span class="highlight-text">6/1 - 6/4</span>（僅收現金）。</li>
-            <li>⏳ <span class="highlight-text">泡菜團到貨日：</span><span class="highlight-text">6/5。</span><span class="highlight-text" style="font-size: 16px; text-decoration: underline;">沒有塑膠袋。沒有塑膠袋，需自備。</span></li>
         </ul>
     </div>
     
@@ -385,7 +383,9 @@
         <div class="form-group">
             <div class="checkbox-group">
                 <label class="checkbox-label"><input type="checkbox" id="admSeafood" checked> 包含 水產團名單</label>
-                <label class="checkbox-label"><input type="checkbox" id="admKimchi" checked> 包含 泡菜團名單</label>
+                <label class="checkbox-label" style="color: #a0aec0; cursor: not-allowed;">
+    <input type="checkbox" id="chkKimchi" disabled> 協發行泡菜 (🚫活動已結束)
+</label>
             </div>
         </div>
         <button class="admin-btn" onclick="printAllOrders()">產生全團出貨單</button>
