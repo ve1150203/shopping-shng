@@ -10,7 +10,6 @@
         h2 { text-align: center; color: #846243; margin-bottom: 5px; font-size: 24px; }
         .subtitle { text-align: center; color: #a07655; margin-bottom: 15px; font-size: 14px; }
         
-        /* 📅 團購重要日程公告區 */
         .notice-board { background-color: #fff5ed; border: 1px dashed #e6a23c; border-radius: 12px; padding: 12px 15px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; color: #c06c30; }
         .notice-board strong { color: #d9534f; }
         .chips-notice { background-color: #fff8f2; border: 1px dashed #ff5722; color: #e65100; padding: 10px 12px; border-radius: 10px; margin-top: 10px; font-size: 13px; }
@@ -35,12 +34,12 @@
         .submit-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, #a07655, #846243); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 15px rgba(132, 98, 67, 0.3); transition: 0.3s; }
         .submit-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
 
-        /* 🧾 收據明細區樣式 */
         .receipt-user-title { font-size: 18px; font-weight: bold; color: #846243; margin-bottom: 15px; padding-left: 5px; border-left: 4px solid #a07655; }
         .receipt-card { background: #fff; border: 2px solid #e0e0e0; border-radius: 15px; padding: 15px; margin-bottom: 15px; }
         .card-brand { font-size: 16px; font-weight: bold; border-bottom: 2px solid #eee; padding-bottom: 6px; margin-bottom: 10px; }
         .receipt-line { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #f5f5f5; font-size: 14px; }
         .card-total { text-align: right; font-size: 16px; font-weight: bold; margin-top: 10px; padding-top: 6px; border-top: 1px solid #eee; }
+        .grand-total-box { background: #fff0f0; border: 1px solid #ffcccc; border-radius: 12px; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; color: #d9534f; margin: 20px 0; }
         .receipt-alert { background-color: #fafafa; border: 1px solid #ddd; border-radius: 12px; padding: 15px; text-align: center; color: #555; font-size: 14px; line-height: 1.6; }
     </style>
 </head>
@@ -82,27 +81,27 @@
 
         <div class="item-card">
             <div class="item-info"><div class="item-name">雪露6杯</div><div class="item-spec">奶素/冷藏4天</div></div><div class="item-price">$220</div>
-            <input type="number" id="qty2" name="qty2" class="qty qty-input" min="0" value="0">
+            <input type="number" id="qty2" name="qty2" class="qty-input" min="0" value="0">
         </div>
         <div class="item-card">
             <div class="item-info"><div class="item-name">焦糖烤布丁6杯</div><div class="item-spec">蛋奶素/冷藏4天</div></div><div class="item-price">$200</div>
-            <input type="number" id="qty3" name="qty3" class="qty qty-input" min="0" value="0">
+            <input type="number" id="qty3" name="qty3" class="qty-input" min="0" value="0">
         </div>
         <div class="item-card">
             <div class="item-info"><div class="item-name">芋泥杯杯4入</div><div class="item-spec">蛋奶素/冷藏4天</div></div><div class="item-price">$290</div>
-            <input type="number" id="qty4" name="qty4" class="qty qty-input" min="0" value="0">
+            <input type="number" id="qty4" name="qty4" class="qty-input" min="0" value="0">
         </div>
         <div class="item-card">
             <div class="item-info"><div class="item-name">芋泥雲朵燒4入</div><div class="item-spec">蛋奶素/冷藏3天</div></div><div class="item-price">$100</div>
-            <input type="number" id="qty5" name="qty5" class="qty qty-input" min="0" value="0">
+            <input type="number" id="qty5" name="qty5" class="qty-input" min="0" value="0">
         </div>
         <div class="item-card">
             <div class="item-info"><div class="item-name">芋泥夾心蛋糕1顆</div><div class="item-spec">蛋奶素/冷藏3天</div></div><div class="item-price">$240</div>
-            <input type="number" id="qty6" name="qty6" class="qty qty-input" min="0" value="0">
+            <input type="number" id="qty6" name="qty6" class="qty-input" min="0" value="0">
         </div>
         <div class="item-card puffs-row">
             <div class="item-info"><div class="item-name">泡芙3入 🌟</div><div class="item-spec">蛋奶素/冷藏4天</div></div><div class="item-price">$100</div>
-            <input type="number" id="qty7" name="qty7" class="qty qty-input" min="0" value="0">
+            <input type="number" id="qty7" name="qty7" class="qty-input" min="0" value="0">
         </div>
 
         <div class="item-card chips-row" style="margin-bottom: 15px;">
@@ -117,8 +116,7 @@
             </div>
             <div class="explain-tag" style="background-color: #e3f2fd; color: #0d47a1;">
                 💡 <strong>主辦人真心話備註：</strong><br>
-                洋芋片6月起官網已全面漲價到一包 $85 元（而且官網買還要額外加運費）。<br>
-                <strong>我們這一團一包算 $85 元是直接【包含運費】喔！</strong>幫大家平攤運費了，不能怪我漲價唷 🥺~
+                洋芋片一包算 $85 元是直接【包含運費】喔！幫大家平攤運費了。
             </div>
         </div>
 
@@ -134,8 +132,7 @@
             </div>
             <div class="explain-tag">
                 💡 <strong>主辦人真心話備註：</strong><br>
-                洋芋片6月起官網已全面漲價到一包 $85 元（而且官網買還要額外加運費）。<br>
-                <strong>我們這一團一包算 $85 元是直接【包含運費】喔！</strong>幫大家平攤運費了，不能怪我漲價唷 🥺~
+                洋芋片一包算 $85 元是直接【包含運費】喔！幫大家平攤運費了。
             </div>
         </div>
 
@@ -144,26 +141,27 @@
 </div>
 
 <div id="receiptContainer" class="container" style="display: none;">
-    
     <div class="receipt-user-title">訂購人姓名：<span id="rUserName" style="color: #d9534f;"></span></div>
 
     <div class="receipt-card" id="cardLianZhen" style="border-color: #f0e6dc; display: none;">
-        <div class="card-brand" style="color: #846243;">🍰 連珍甜點：</div>
+        <div class="card-brand" style="color: #846243;">🍰 連珍甜點 明細：</div>
         <div id="rLianZhenItems"></div>
-        <div class="card-total" style="color: #846243;">小計：<span id="rLianZhenTotal">$0</span></div>
+        <div class="card-total" style="color: #846243;">連珍小計：<span id="rLianZhenTotal">$0</span></div>
     </div>
 
     <div class="receipt-card" id="cardChips" style="border-color: #ffccbc; display: none;">
-        <div class="card-brand" style="color: #ff5722;">🥔 洋芋片：</div>
+        <div class="card-brand" style="color: #ff5722;">🥔 洋芋片 明細：</div>
         <div id="rChipsItems"></div>
-        <div class="card-total" style="color: #ff5722;">小計：<span id="rChipsTotal">$0</span></div>
+        <div class="card-total" style="color: #ff5722;">洋芋片小計：<span id="rChipsTotal">$0</span></div>
     </div>
+
+    <div class="grand-total-box">應付總金額：<span id="rGrandTotal">$0 元</span></div>
 
     <div class="notice-board" style="margin-top: 20px;">
         <strong>【開團日程複習】</strong><br>
         🍰 連珍：6/18 付款，6/22 當週到貨。<br>
-        🥔 7月洋芋片：<strong>6 月份</strong>付款，<strong>7 月中旬</strong>到貨。<br>
-        🥔 9月洋芋片：<strong>8 月份</strong>才付款，<strong>9 月中旬</strong>到貨。
+        🥔 7月洋芋片：6 月份付款，7 月中旬到貨。<br>
+        🥔 9月洋芋片：8 月份才付款，9 月中旬到貨。
     </div>
 
     <div class="receipt-alert">
@@ -173,10 +171,10 @@
 </div>
 
 <script>
-    // 🌐 請確認此網頁與上方的 GAS 後台網址完全一致
-    const targetUrl = "https://script.google.com/macros/s/AKfycbzcldE65Ys7LZ4skQxplLvOPsr20QkJfr1vQ_mjEnltzLgMnxYzcIUU-OKdHEAbm2dY4g/exec";
+    // ⚠️ 關鍵：請將下方的網址替換為您在第一步中「重新部署」後產生的最新 GAS 網頁應用程式網址！
+    const targetUrl = "https://script.google.com/macros/s/AKfycby5kMp_fb519o10F6ic2mlYBSfjS-uX-o1srg9LVHFZQD2hJQydpWCLGwilR96Z58wNXQ/exec";
 
-    // 🔄 頁面一開啟，動態跟 GAS 索取真正扣除後的剩餘數量
+    // 頁面加載時自動獲取庫存
     window.addEventListener('DOMContentLoaded', () => {
         fetch(targetUrl)
         .then(res => res.json())
@@ -191,7 +189,6 @@
         });
     });
 
-    // 🦐 模擬蝦皮庫存即時連動選單
     function setupStockSelect(selectId, tagId, availableStock, maxLimit) {
         const selectEl = document.getElementById(selectId);
         const tagEl = document.getElementById(tagId);
@@ -202,11 +199,9 @@
             tagEl.style.color = '#999';
             selectEl.innerHTML = '<option value="0">已滿單 ❌</option>';
             selectEl.disabled = true;
-            selectEl.style.backgroundColor = '#eee';
         } else {
             tagEl.innerText = `尚有 ${availableStock} 包可下單 / 限量 ${maxLimit} 包 🔥`;
             let optionsHtml = '<option value="0">0 包</option>';
-            // 使用者最多只能選到當前剩餘的數量
             for (let i = 1; i <= Math.min(availableStock, maxLimit); i++) {
                 optionsHtml += `<option value="${i}">${i} 包</option>`;
             }
@@ -214,7 +209,7 @@
         }
     }
 
-    // 處理表單背景發送與畫面切換
+    // 處理非同步表單送出，不再引發跳轉
     document.getElementById('orderForm').addEventListener('submit', function(e) {
         e.preventDefault(); 
 
@@ -238,7 +233,6 @@
         submitBtn.disabled = true;
         submitBtn.innerText = "訂單傳送中，請稍後...";
 
-        // 打包數據傳送至後台
         const formData = new FormData();
         formData.append('username', name);
         formData.append('qty1', q1);
@@ -265,7 +259,6 @@
         });
     });
 
-    // 精準渲染卡片明細並保留名字
     function showReceipt(name, q1, q2, q3, q4, q5, q6, q7, q8, q9) {
         document.getElementById('rUserName').innerText = name;
 
@@ -275,11 +268,11 @@
 
         let lzHtml = "";
         if(q1 > 0) lzHtml += `<div class="receipt-line"><span>芋泥球</span><span>x ${q1} 盒</span></div>`;
-        if(q2 > 0) lzHtml += `<div class="receipt-line"><span>雪露</span><span>x ${q2} 杯</span></div>`;
-        if(q3 > 0) lzHtml += `<div class="receipt-line"><span>烤布丁</span><span>x ${q3} 杯</span></div>`;
-        if(q4 > 0) lzHtml += `<div class="receipt-line"><span>芋泥杯杯</span><span>x ${q4} 入</span></div>`;
-        if(q5 > 0) lzHtml += `<div class="receipt-line"><span>芋泥雲朵燒</span><span>x ${q5} 入</span></div>`;
-        if(q6 > 0) lzHtml += `<div class="receipt-line"><span>芋泥夾心蛋糕</span><span>x ${q6} 顆</span></div>`;
+        if(q2 > 0) lzHtml += `<div class="receipt-line"><span>雪露6杯</span><span>x ${q2} 杯</span></div>`;
+        if(q3 > 0) lzHtml += `<div class="receipt-line"><span>焦糖烤布丁</span><span>x ${q3} 杯</span></div>`;
+        if(q4 > 0) lzHtml += `<div class="receipt-line"><span>芋泥杯杯4入</span><span>x ${q4} 入</span></div>`;
+        if(q5 > 0) lzHtml += `<div class="receipt-line"><span>芋泥雲朵燒4入</span><span>x ${q5} 入</span></div>`;
+        if(q6 > 0) lzHtml += `<div class="receipt-line"><span>芋泥夾心蛋糕1顆</span><span>x ${q6} 顆</span></div>`;
         if(q7 > 0) lzHtml += `<div class="receipt-line"><span>泡芙3入</span><span>x ${q7} 入</span></div>`;
         
         if(lianZhenTotal > 0) {
@@ -298,6 +291,7 @@
             document.getElementById('cardChips').style.display = "block";
         } else { document.getElementById('cardChips').style.display = "none"; }
 
+        document.getElementById('rGrandTotal').innerText = "$" + (lianZhenTotal + chipsTotal) + " 元";
         document.getElementById('mainFormContainer').style.display = 'none';
         document.getElementById('receiptContainer').style.display = 'block';
         window.scrollTo(0, 0);
