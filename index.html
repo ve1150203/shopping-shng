@@ -31,12 +31,19 @@
 
         .submit-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, #a07655, #846243); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 15px rgba(132, 98, 67, 0.3); transition: 0.3s; }
         .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(132, 98, 67, 0.4); }
+
+        /* 🧾 新增：下單成功收據畫面樣式 */
+        .receipt-title { text-align: center; color: #2baf2b; font-size: 26px; font-weight: bold; margin-bottom: 15px; }
+        .receipt-box { background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+        .receipt-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 15px; }
+        .receipt-total { display: flex; justify-content: space-between; padding: 12px 0 0 0; font-size: 19px; font-weight: bold; color: #d9534f; }
+        .receipt-alert { background-color: #fff0f0; border: 1px solid #ffcccc; border-radius: 12px; padding: 15px; text-align: center; color: #d9534f; font-size: 15px; line-height: 1.6; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>🍰 欣雄開冰箱~~『連珍芋泥』團購</h2>
+<div id="mainFormContainer" class="container">
+    <h2>🍰 欣雄開冰箱~~『連珍芋泥』甜點團購</h2>
     <div class="subtitle">填寫姓名與數量，自動計算金額並同步</div>
     
     <div class="notice-board">
@@ -127,12 +134,34 @@
     </form>
 </div>
 
+<div id="receiptContainer" class="container" style="display: none;">
+    <div class="receipt-title">🎉 訂單送出成功！</div>
+    <div class="subtitle" style="margin-bottom:20px;">您的個人訂購明細如下，資料已即時同步至後台</div>
+    
+    <div class="receipt-box">
+        <div class="receipt-line"><strong>訂購人姓名：</strong><span id="rName"></span></div>
+        <div id="rItems"></div> <div class="receipt-total"><strong>本次總金額：</strong><span id="rTotal"></span></div>
+    </div>
+
+    <div class="notice-board">
+        📅 <strong>團購開團時間：</strong>6/15 (一) ~ 6/17 (三) 截止<br>
+        💰 <strong>團隊付款日期：</strong>6/18 (四) 記得找主辦人結帳喔<br>
+        📦 <strong>預計到貨日期：</strong>6/22 那個星期（確切日期會再通知）
+    </div>
+
+    <div class="receipt-alert">
+        🚨 系統【不提供】事後查單（個人金額）服務 🚨<br><br>
+        📸 請務必立刻對本畫面進行【螢幕截圖】保存！<br>
+        👋 看完並截圖後，請直接關閉此網頁分頁即可。
+    </div>
+</div>
+
 <script>
     document.getElementById('orderForm').addEventListener('submit', function(e) {
-        // 阻止網頁預設的跳轉行為，由我們控制原地重整
-        e.preventDefault(); 
+        e.preventDefault(); // 攔截預設摔去後台的轉址行為
 
-        // 抓取各欄位的訂購數量
+        // 1. 抓取欄位與數量
+        const name = document.getElementById('username').value;
         const q1 = parseInt(document.getElementById('qty1').value) || 0;
         const q2 = parseInt(document.getElementById('qty2').value) || 0;
         const q3 = parseInt(document.getElementById('qty3').value) || 0;
@@ -143,36 +172,39 @@
 
         const totalItems = q1 + q2 + q3 + q4 + q5 + q6 + q7;
 
-        // 防呆：如果完全沒選數量就按送出
         if(totalItems === 0) { 
             alert('請至少選擇一項產品數量！'); 
             return;
         }
 
-        // 核心計價邏輯（包含芋泥球階梯優惠）
+        // 2. 計算金額
         let taroPrice = 0;
         if (q1 === 4) { taroPrice = 240; } else { taroPrice = q1 * 65; }
-        
         const totalAmount = taroPrice + (q2 * 220) + (q3 * 200) + (q4 * 290) + (q5 * 100) + (q6 * 240) + (q7 * 100);
-        const username = document.getElementById('username').value;
 
-        // 🌟 彈出強烈警告視窗，計算好精準總金額，強迫同事截圖
-        alert(
-            "【🚨 請注意！系統不提供事後查單服務 🚨】\n\n" +
-            username + " 同事您好：\n" +
-            "您的本次訂購總金額為：$" + totalAmount + " 元。\n\n" +
-            "👉 請務必對目前這個畫面進行【螢幕截圖】保存金額！\n" +
-            "👉 付款日為 6/18 (四)，屆時請依截圖金額付款給主辦人。\n\n" +
-            "點擊「確定」後將正式送出並同步資料。"
-        );
-
-        // 🌟 執行送出：在背景默默把資料塞進試算表
+        // 3. 在背景悄悄把表單數據射去 Google 試算表
         this.submit();
 
-        // 🌟 原地重新整理：送出後 1 秒鐘自動洗掉畫面，變回最乾淨的初始狀態，方便接下一單
-        setTimeout(function() {
-            location.reload();
-        }, 1000);
+        // 4. ✨ 變身魔法：動態把有買的品項列在明細中
+        document.getElementById('rName').innerText = name;
+        document.getElementById('rTotal').innerText = "$" + totalAmount + " 元";
+        
+        let itemsHtml = "";
+        if(q1 > 0) itemsHtml += `<div class="receipt-line"><span>芋泥球(4入/盒)</span><span>${q1} 盒</span></div>`;
+        if(q2 > 0) itemsHtml += `<div class="receipt-line"><span>雪露6杯</span><span>${q2} 杯</span></div>`;
+        if(q3 > 0) itemsHtml += `<div class="receipt-line"><span>焦糖烤布丁6杯</span><span>${q3} 杯</span></div>`;
+        if(q4 > 0) itemsHtml += `<div class="receipt-line"><span>芋泥杯杯4入</span><span>${q4} 入</span></div>`;
+        if(q5 > 0) itemsHtml += `<div class="receipt-line"><span>芋泥雲朵燒4入</span><span>${q5} 入</span></div>`;
+        if(q6 > 0) itemsHtml += `<div class="receipt-line"><span>芋泥夾心蛋糕1顆</span><span>${q6} 顆</span></div>`;
+        if(q7 > 0) itemsHtml += `<div class="receipt-line"><span>泡芙3入</span><span>${q7} 入</span></div>`;
+        document.getElementById('rItems').innerHTML = itemsHtml;
+
+        // 5. 隱藏原本的填單畫面，將「電子收據畫面」顯示出來
+        document.getElementById('mainFormContainer').style.display = 'none';
+        document.getElementById('receiptContainer').style.display = 'block';
+        
+        // 畫面自動捲動回最上方，方便同事截圖
+        window.scrollTo(0, 0);
     });
 </script>
 </body>
