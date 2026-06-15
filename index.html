@@ -36,7 +36,7 @@
 <body>
 
 <div class="container">
-    <h2>🍰 欣雄開冰箱--『連珍芋泥』團購</h2>
+    <h2>🍰 欣雄開冰箱~~『連珍芋泥』團購</h2>
     <div class="subtitle">填寫姓名與數量，自動計算金額並同步</div>
     
     <div class="notice-board">
@@ -45,7 +45,7 @@
         📦 <strong>預計到貨日期：</strong>6/22 那個星期（確切日期會再通知）
     </div>
 
-    <form id="orderForm" method="POST" action="https://script.google.com/macros/s/AKfycbyXjtZu6WkcjTa9bCgc6xWDno_XzeiD-q1Gy1P-vIdvGC7lcftVIC5-8vBta4Q_zoYjhQ/exec">
+    <form id="orderForm" method="POST" action="https://script.google.com/macros/s/AKfycbzTeTHOeDJNSEW5Q2qwsCfHhgvDbe4XbeeBKtLuAZpFYlBlw69DgGa2zAkL-J_YyrGMMw/exec">
         
         <div class="input-box">
             <label for="username">訂購人姓名 *</label>
@@ -129,7 +129,10 @@
 
 <script>
     document.getElementById('orderForm').addEventListener('submit', function(e) {
-        // 抓取各品項數量
+        // 阻止網頁預設的跳轉行為，由我們控制原地重整
+        e.preventDefault(); 
+
+        // 抓取各欄位的訂購數量
         const q1 = parseInt(document.getElementById('qty1').value) || 0;
         const q2 = parseInt(document.getElementById('qty2').value) || 0;
         const q3 = parseInt(document.getElementById('qty3').value) || 0;
@@ -140,28 +143,36 @@
 
         const totalItems = q1 + q2 + q3 + q4 + q5 + q6 + q7;
 
+        // 防呆：如果完全沒選數量就按送出
         if(totalItems === 0) { 
-            e.preventDefault(); 
             alert('請至少選擇一項產品數量！'); 
             return;
         }
 
-        // 🌟 2. 在網頁端直接即時試算金額，跳出彈出視窗逼同事截圖
+        // 核心計價邏輯（包含芋泥球階梯優惠）
         let taroPrice = 0;
         if (q1 === 4) { taroPrice = 240; } else { taroPrice = q1 * 65; }
         
         const totalAmount = taroPrice + (q2 * 220) + (q3 * 200) + (q4 * 290) + (q5 * 100) + (q6 * 240) + (q7 * 100);
         const username = document.getElementById('username').value;
 
-        // 彈出強烈警告視窗
+        // 🌟 彈出強烈警告視窗，計算好精準總金額，強迫同事截圖
         alert(
             "【🚨 請注意！系統不提供事後查單服務 🚨】\n\n" +
-            username + " 您好：\n" +
+            username + " 同事您好：\n" +
             "您的本次訂購總金額為：$" + totalAmount + " 元。\n\n" +
             "👉 請務必對目前這個畫面進行【螢幕截圖】保存金額！\n" +
             "👉 付款日為 6/18 (四)，屆時請依截圖金額付款給主辦人。\n\n" +
-            "點擊「確定」後將正式送出檔案並同步至試算表。"
+            "點擊「確定」後將正式送出並同步資料。"
         );
+
+        // 🌟 執行送出：在背景默默把資料塞進試算表
+        this.submit();
+
+        // 🌟 原地重新整理：送出後 1 秒鐘自動洗掉畫面，變回最乾淨的初始狀態，方便接下一單
+        setTimeout(function() {
+            location.reload();
+        }, 1000);
     });
 </script>
 </body>
