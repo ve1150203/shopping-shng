@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>欣雄開冰箱下單</title>
+    <title>甜點與零食團購下單系統</title>
     <style>
         body { font-family: 'Helvetica Neue', Arial, "Microsoft JhengHei", sans-serif; background-color: #fcf8f5; color: #4A3728; margin: 0; padding: 15px; }
         .container { max-width: 500px; background: #fff; margin: 10px auto; padding: 25px; border-radius: 20px; box-shadow: 0 8px 30px rgba(160, 118, 85, 0.1); border: 1px solid #f0e6dc; }
@@ -29,10 +29,11 @@
         
         .submit-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, #a07655, #846243); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 15px rgba(132, 98, 67, 0.3); }
 
-        .receipt-card { background: #fff; border: 2px solid #e0e0e0; border-radius: 15px; padding: 15px; margin-bottom: 15px; }
-        .card-brand { font-size: 16px; font-weight: bold; border-bottom: 2px solid #eee; padding-bottom: 6px; margin-bottom: 10px; }
-        .receipt-line { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #f5f5f5; font-size: 14px; }
-        .card-total { text-align: right; font-size: 16px; font-weight: bold; margin-top: 10px; padding-top: 6px; border-top: 1px solid #eee; }
+        .receipt-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .receipt-user { font-size: 18px; font-weight: bold; color: #846243; margin-bottom: 15px; border-bottom: 2px solid #f0e6dc; padding-bottom: 8px; }
+        .card-brand { font-size: 16px; font-weight: bold; border-bottom: 2px solid #eee; padding-bottom: 6px; margin-bottom: 10px; color: #5d4037; }
+        .receipt-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #f5f5f5; font-size: 15px; }
+        .card-total { text-align: right; font-size: 16px; font-weight: bold; margin-top: 12px; padding-top: 8px; border-top: 1px solid #eee; color: #d9534f; }
     </style>
 </head>
 <body>
@@ -43,9 +44,9 @@
     
     <div class="notice-board">
         <strong>【團購時程表】</strong><br>
-        📅 截止：7/3 (五) 15:30<br>
-        💰 蛋糕付款：7/6/ (一) 📦 到貨：待通知<br>
-        💰 洋芋片付款：6月份付7月單，8月份付9月單。📦 到貨：7月中旬/9月中旬<br>
+        📅 喬伊絲截止：7/2 (四) 15:30<br>
+        💰 蛋糕付款：7/6 (一) 📦 到貨：待通知<br>
+        💰 洋芋片付款：6月份付7月單，8月份付9月單。📦 到貨：7月中旬、9月中旬
         <div class="chips-notice" id="topLiveNotice">📢 7月洋芋片已滿單；9月預購同步中...</div>
     </div>
 
@@ -147,17 +148,21 @@
 </div>
 
 <div id="receiptContainer" class="container" style="display: none;">
+    <div class="receipt-user">👤 訂購人姓名：<span id="rUsername" style="color: #4A3728;"></span></div>
+
     <div class="receipt-card" id="cardJoyce">
         <div class="card-brand">🍰 喬伊絲蛋糕訂單：</div>
         <div id="rJoyceItems"></div>
         <div class="card-total">蛋糕小計：<span id="rJoyceTotal">$0</span></div>
     </div>
+
     <div class="receipt-card" id="cardChips">
         <div class="card-brand">🥔 洋芋片訂單：</div>
         <div id="rChipsItems"></div>
         <div class="card-total">洋芋片小計：<span id="rChipsTotal">$0</span></div>
     </div>
-    <div style="text-align:center; padding:15px; background:#fff5ed; border-radius:10px; color:#846243;">
+
+    <div style="text-align:center; padding:15px; background:#fff5ed; border-radius:10px; color:#846243; margin-top: 20px;">
         🚨 <strong style="color: #d9534f; font-size: 18px;">訂單已成功送出！</strong><br><br>
         請務必<strong>【截圖保存】</strong>此收據畫面，並依上方金額繳費。
     </div>
@@ -166,7 +171,6 @@
 <script>
     const backendUrl = "https://script.google.com/macros/s/AKfycbx8APRynr6uS056-EmobKOlnX3oM3mRG9eeypKU96UA_xPZdeBSEcPT6woNxyO1tGWVjA/exec";
 
-    // 網頁開啟時，自動非同步連線後台抓最新剩餘庫存
     window.addEventListener('DOMContentLoaded', () => {
         fetch(backendUrl)
         .then(response => response.json())
@@ -202,7 +206,7 @@
     });
 
     document.getElementById('orderForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // 💡 核心：阻止傳統網頁跳轉！
+        e.preventDefault(); 
 
         const q1 = parseInt(document.getElementById('qty1').value) || 0;
         const q2 = parseInt(document.getElementById('qty2').value) || 0;
@@ -220,12 +224,10 @@
             return; 
         }
 
-        // 顯示送出中狀態，防止重複點擊
         const btn = document.getElementById('btnSubmitText');
         btn.innerText = "正在傳送訂單，請稍後...";
         btn.disabled = true;
 
-        // 💡 透過背景 fetch 將資料打包成 FormData 丟給 Google 試算表
         const formData = new FormData();
         formData.append('username', name);
         formData.append('qty1', q1);
@@ -242,17 +244,14 @@
             method: 'POST',
             body: formData
         })
-        .then(res => {
-            console.log('資料成功傳送至試算表');
-        })
-        .catch(err => {
-            console.error('傳送錯誤，但仍生成帳單：', err);
-        });
+        .then(res => { console.log('資料成功傳送至試算表'); })
+        .catch(err => { console.error('傳送錯誤：', err); });
 
-        // 💡 同時立刻在網頁上渲染妳辛苦寫好的收據清單，完全不需要等網頁重整！
+        // 填入姓名
+        document.getElementById('rUsername').innerText = name;
+
+        // 渲染蛋糕明細
         const joyceTotal = (q1 * 240) + (q2 * 270) + (q3 * 230) + (q4 * 250) + (q5 * 300) + (q6 * 300) + (q7 * 300);
-        const chipsTotal = (q8 + q9) * 85;
-
         let jzHtml = "";
         const names = ["楓糖布蕾---楓糖", "絲博巧磚---巧克力", "伯爵提拉---英式伯爵茶", "摩卡焦糖---咖啡", "特濃牛奶蛋糕", "抹茶牛奶蛋糕", "芋香牛奶蛋糕"];
         const qtys = [q1, q2, q3, q4, q5, q6, q7];
@@ -262,17 +261,20 @@
         document.getElementById('rJoyceTotal').innerText = "$" + joyceTotal;
         document.getElementById('cardJoyce').style.display = joyceTotal > 0 ? "block" : "none";
 
+        // 渲染洋芋片明細
+        const chipsTotal = (q8 + q9) * 85;
         let chipsHtml = "";
-        if(q8 > 0) chipsHtml += `<div class="receipt-line"><span>7月洋芋片</span><span>x ${q8}</span></div>`;
-        if(q9 > 0) chipsHtml += `<div class="receipt-line"><span>9月洋芋片</span><span>x ${q9}</span></div>`;
+        if(q8 > 0) chipsHtml += `<div class="receipt-line"><span>LESSON ONE 7月洋芋片</span><span>x ${q8}</span></div>`;
+        if(q9 > 0) chipsHtml += `<div class="receipt-line"><span>LESSON ONE 9月洋芋片</span><span>x ${q9}</span></div>`;
+        
         document.getElementById('rChipsItems').innerHTML = chipsHtml;
         document.getElementById('rChipsTotal').innerText = "$" + chipsTotal;
         document.getElementById('cardChips').style.display = (q8+q9) > 0 ? "block" : "none";
 
-        // 切換顯示區塊
+        // 切換區塊
         document.getElementById('mainFormContainer').style.display = 'none';
         document.getElementById('receiptContainer').style.display = 'block';
-        window.scrollTo(0, 0); // 貼心將畫面捲到最上面方便截圖
+        window.scrollTo(0, 0); 
     });
 </script>
 </body>
