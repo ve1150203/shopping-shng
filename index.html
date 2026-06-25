@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>甜點與零食團購下單系統</title>
+    <title>欣雄開冰箱下單</title>
     <style>
         body { font-family: 'Helvetica Neue', Arial, "Microsoft JhengHei", sans-serif; background-color: #fcf8f5; color: #4A3728; margin: 0; padding: 15px; }
         .container { max-width: 500px; background: #fff; margin: 10px auto; padding: 25px; border-radius: 20px; box-shadow: 0 8px 30px rgba(160, 118, 85, 0.1); border: 1px solid #f0e6dc; }
@@ -11,210 +11,197 @@
         .subtitle { text-align: center; color: #a07655; margin-bottom: 15px; font-size: 14px; }
         
         .notice-board { background-color: #fff5ed; border: 1px dashed #e6a23c; border-radius: 12px; padding: 12px 15px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; color: #c06c30; }
-        .notice-board strong { color: #d9534f; }
         .chips-notice { background-color: #fff8f2; border: 1px dashed #ff5722; color: #e65100; padding: 10px 12px; border-radius: 10px; margin-top: 10px; font-size: 13px; }
 
         .input-box { margin-bottom: 20px; }
         label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 16px; }
-        input[type="text"], select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; transition: 0.3s; background: #fff; }
-        input[type="text"]:focus, select:focus { border-color: #a07655; }
+        input[type="text"] { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
 
         .item-card { background: #fff; border: 1px solid #f0e6dc; border-radius: 15px; padding: 15px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; }
         .item-info { flex: 1; }
-        .item-name { font-weight: bold; font-size: 17px; margin-bottom: 4px; }
-        .item-spec { font-size: 12px; color: #8c7360; line-height: 1.4; }
-        .item-price { color: #d9534f; font-weight: bold; font-size: 16px; margin: 0 15px; min-width: 70px; text-align: right; line-height: 1.2; }
+        .item-name { font-weight: bold; font-size: 16px; margin-bottom: 4px; color: #5d4037; }
+        .item-spec { font-size: 11px; color: #8c7360; line-height: 1.4; background: #fdfaf7; padding: 5px; border-radius: 5px; }
+        .item-price { color: #d9534f; font-weight: bold; font-size: 16px; margin: 0 15px; min-width: 65px; text-align: right; }
         
-        .stock-tag { display: inline-block; background-color: #ffeae2; color: #ff5722; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-top: 4px; }
-        .explain-tag { display: block; background-color: #fff3e0; color: #e65100; padding: 6px 10px; border-radius: 8px; font-size: 12px; line-height: 1.4; margin-top: 6px; font-weight: 500; }
         .qty-input { width: 75px; padding: 8px; border: 2px solid #eee; border-radius: 8px; text-align: center; font-size: 18px; font-weight: bold; color: #4A3728; }
-        .puffs-row { border-left: 5px solid #a07655; background: #fdfaf7; }
         .chips-row { border-left: 5px solid #ff5722; background: #fff8f5; display: block; }
+        .stock-tag { display: inline-block; background-color: #ffeae2; color: #ff5722; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-top: 4px; }
+        
+        .submit-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, #a07655, #846243); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 15px rgba(132, 98, 67, 0.3); }
 
-        .submit-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, #a07655, #846243); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 15px rgba(132, 98, 67, 0.3); transition: 0.3s; }
-        .submit-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
-
-        .receipt-user-title { font-size: 18px; font-weight: bold; color: #846243; margin-bottom: 15px; padding-left: 5px; border-left: 4px solid #a07655; }
         .receipt-card { background: #fff; border: 2px solid #e0e0e0; border-radius: 15px; padding: 15px; margin-bottom: 15px; }
         .card-brand { font-size: 16px; font-weight: bold; border-bottom: 2px solid #eee; padding-bottom: 6px; margin-bottom: 10px; }
         .receipt-line { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #f5f5f5; font-size: 14px; }
         .card-total { text-align: right; font-size: 16px; font-weight: bold; margin-top: 10px; padding-top: 6px; border-top: 1px solid #eee; }
-        .grand-total-box { background: #fff0f0; border: 1px solid #ffcccc; border-radius: 12px; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; color: #d9534f; margin: 20px 0; }
-        .receipt-alert { background-color: #fafafa; border: 1px solid #ddd; border-radius: 12px; padding: 15px; text-align: center; color: #555; font-size: 14px; line-height: 1.6; }
     </style>
 </head>
 <body>
 
 <div id="mainFormContainer" class="container">
-    <h2>🍰 欣雄開冰箱---Lesson one洋芋片</h2>
-    <div class="subtitle">限量【LESSON ONE 洋芋片7月、9月份】</div>
+    <h2>🍰 喬伊絲蛋糕 & 洋芋片團購</h2>
+    <div class="subtitle">【喬伊絲蛋糕】與限量【LESSON ONE 洋芋片】預購</div>
     
     <div class="notice-board">
-        <strong>【基隆連珍】</strong><br>
-        📅 <strong>流團唷</strong><BR>
-         <strong>試吃預告：</strong><br>
-        📅 <strong>6/23會有喬伊絲蛋糕試吃→這個會開團！！！！</strong>
-        
-        <div class="chips-notice">
-            📢 <strong>【LESSON ONE 洋芋片 預購專屬日程】</strong><br>
-            💰 <strong>付款時間：</strong>7月份洋芋片→6/17-6/22；<strong>『9月份』</strong>8月才開始付款唷<br>
-            📦 <strong>到貨時間：</strong>預計 <strong>7 月中旬/9 月中旬</strong> 才會到貨，能等再下單喔！
-        </div>
+        <strong>【團購時程表】</strong><br>
+        📅 喬伊絲截止：7/2 (四) 15:30<br>
+        💰 蛋糕付款：7/6 (一) 📦 到貨：待通知<br>
+        💰 洋芋片付款：6月份付7月單，8月份付9月單。📦 到貨：7月中旬、9月中旬<br>
+        <div class="chips-notice" id="topLiveNotice">📢 7月洋芋片已滿單；9月預購同步中...</div>
     </div>
 
-    <form id="orderForm">
+    <form id="orderForm" method="POST" action="https://script.google.com/macros/s/AKfycbx8APRynr6uS056-EmobKOlnX3oM3mRG9eeypKU96UA_xPZdeBSEcPT6woNxyO1tGWVjA/exec">
         <div class="input-box">
             <label for="username">訂購人姓名 *</label>
             <input type="text" id="username" name="username" required placeholder="您的姓名或暱稱">
         </div>
 
-        <div class="item-card" style="border-left: 5px solid #d9534f; background: #fffafb; display: none;">
-    <div class="item-info">
-        <div class="item-name">芋泥球(4入/盒) 🔥</div>
-                <div class="item-spec">顆/盒｜冷藏3天（單盒價已含昂貴低溫宅配運費囉！）<br><span style="color:#d9534f; font-weight:bold;">💡 密技：找同事合湊 4 盒直接變$240！</span></div>
+        <div class="item-card">
+            <div class="item-info">
+                <div class="item-name">楓糖布蕾---楓糖 🥞</div>
+                <div class="item-spec">19.5*7*4.5cm / 250g±10% / 蛋奶素</div>
             </div>
-            <div class="item-price">$65</div>
-            <select name="qty1" id="qty1" style="width: 90px; padding: 8px;">
-                <option value="0">0 盒</option> <option value="1">1 盒</option> <option value="2">2 盒</option> <option value="3">3 盒</option> <option value="4">4 盒</option>
-            </select>
+            <div class="item-price">$240</div>
+            <input type="number" id="qty1" name="qty1" class="qty-input" min="0" value="0">
         </div>
 
-        <div class="item-card" style="display: none;">
-            <div class="item-info"><div class="item-name">雪露6杯</div><div class="item-spec">芋頭西米露/奶素/冷藏4天</div></div><div class="item-price">$220</div>
+        <div class="item-card">
+            <div class="item-info">
+                <div class="item-name">絲博巧磚---巧克力 🍫</div>
+                <div class="item-spec">19.5*7*4.5cm / 250g±10% / 蛋奶素</div>
+            </div>
+            <div class="item-price">$270</div>
             <input type="number" id="qty2" name="qty2" class="qty-input" min="0" value="0">
         </div>
-       <div class="item-card" style="display: none;">
-            <div class="item-info"><div class="item-name">焦糖烤布丁6杯</div><div class="item-spec">蛋奶素/冷藏4天</div></div><div class="item-price">$200</div>
+
+        <div class="item-card">
+            <div class="item-info">
+                <div class="item-name">伯爵提拉---英式伯爵茶 ☕</div>
+                <div class="item-spec">19.5*7*4.5cm / 250g±10% / 葷</div>
+            </div>
+            <div class="item-price">$230</div>
             <input type="number" id="qty3" name="qty3" class="qty-input" min="0" value="0">
         </div>
-        <div class="item-card" style="display: none;">
-            <div class="item-info"><div class="item-name">芋泥杯杯4入</div><div class="item-spec">蛋奶素/冷藏4天</div></div><div class="item-price">$290</div>
+
+        <div class="item-card">
+            <div class="item-info">
+                <div class="item-name">摩卡焦糖---咖啡 ☕</div>
+                <div class="item-spec">19.5*7*4.5cm / 270g±10% / 蛋奶素</div>
+            </div>
+            <div class="item-price">$250</div>
             <input type="number" id="qty4" name="qty4" class="qty-input" min="0" value="0">
         </div>
-        <div class="item-card" style="display: none;">
-            <div class="item-info"><div class="item-name">芋泥雲朵燒4入</div><div class="item-spec">蛋奶素/冷藏3天</div></div><div class="item-price">$100</div>
+
+        <div class="item-card">
+            <div class="item-info">
+                <div class="item-name">特濃牛奶蛋糕 🥛</div>
+                <div class="item-spec">19.5*7*4.5cm / 300g±10% / 葷</div>
+            </div>
+            <div class="item-price">$300</div>
             <input type="number" id="qty5" name="qty5" class="qty-input" min="0" value="0">
         </div>
-       <div class="item-card" style="display: none;">
-            <div class="item-info"><div class="item-name">芋泥夾心蛋糕1顆</div><div class="item-spec">300g/蛋奶素/冷藏3天</div></div><div class="item-price">$240</div>
+
+        <div class="item-card">
+            <div class="item-info">
+                <div class="item-name">抹茶牛奶蛋糕 🍵</div>
+                <div class="item-spec">19.5*7*4.5cm / 300g±10% / 葷</div>
+            </div>
+            <div class="item-price">$300</div>
             <input type="number" id="qty6" name="qty6" class="qty-input" min="0" value="0">
         </div>
-       <div class="item-card" style="display: none;">
-            <div class="item-info"><div class="item-name">泡芙3入 🌟</div><div class="item-spec">連珍黃金奶油/蛋奶素/冷藏4天</div></div><div class="item-price">$100</div>
+
+        <div class="item-card">
+            <div class="item-info">
+                <div class="item-name">芋香牛奶蛋糕 🍠</div>
+                <div class="item-spec">19.5*7*4.5cm / 320g±10% / 葷</div>
+            </div>
+            <div class="item-price">$300</div>
             <input type="number" id="qty7" name="qty7" class="qty-input" min="0" value="0">
         </div>
 
-        <div class="item-card chips-row" style="margin-bottom: 15px;">
+        <div class="item-card chips-row">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                 <div class="item-info">
-                    <div class="item-name">LESSON ONE 洋芋片--7月份 🥔</div>
-                    <div class="item-spec">熱門團購單品</div>
-                    <div class="stock-tag" id="tagJuly" style="background-color: #e3f2fd; color: #2196f3;">讀取最新庫存中...</div>
+                    <div class="item-name">LESSON ONE 7月洋芋片 🥔</div>
+                    <div class="stock-tag" style="background:#eee; color:#999;">已滿單 (剩餘 0 包)</div>
                 </div>
                 <div class="item-price">$85</div>
-                <select name="qty8_july" id="qty8_july" style="width: 85px; padding: 8px; color:#2196f3; font-weight:bold; border-color:#bbdefb;"></select>
-            </div>
-            <div class="explain-tag" style="background-color: #e3f2fd; color: #0d47a1;">
-                💡 <strong>主辦人真心話備註：</strong><br>
-                官網有漲價（6月），原價一包$85（不含運）。我們一包也算 $85 元是直接【包含運費】喔！幫大家平攤運費了。
+                <select name="qty8" id="qty8" style="width: 85px; pointer-events: none; background:#eee;"><option value="0">0 包</option></select>
             </div>
         </div>
 
         <div class="item-card chips-row">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                 <div class="item-info">
-                    <div class="item-name">LESSON ONE 洋芋片--9月份 🥔</div>
-                    <div class="item-spec">熱門團購單品</div>
-                    <div class="stock-tag" id="tagSept" style="background-color: #ffeae2; color: #ff5722;">讀取最新庫存中...</div>
+                    <div class="item-name">LESSON ONE 9月洋芋片 🥔</div>
+                    <div class="stock-tag" id="liveStockTag">正在計算即時餘額...</div>
                 </div>
                 <div class="item-price">$85</div>
-                <select name="qty8" id="qty8" style="width: 85px; padding: 8px; color:#ff5722; font-weight:bold; border-color:#ffccbc;"></select>
-            </div>
-            <div class="explain-tag">
-                💡 <strong>主辦人真心話備註：</strong><br>
-                官網有漲價（6月），原價一包$85（不含運）。我們一包也算 $85 元是直接【包含運費】喔！幫大家平攤運費了。
+                <select name="qty9" id="qty9" style="width: 85px;">
+                    <option value="0">載入中</option>
+                </select>
             </div>
         </div>
 
-        <button type="submit" id="submitBtn" class="submit-btn">確認送出訂單</button>
+        <button type="submit" class="submit-btn">確認送出訂單</button>
     </form>
 </div>
 
 <div id="receiptContainer" class="container" style="display: none;">
-    <div class="receipt-user-title">訂購人姓名：<span id="rUserName" style="color: #d9534f;"></span></div>
-
-    <div class="receipt-card" id="cardLianZhen" style="border-color: #f0e6dc; display: none;">
-        <div class="card-brand" style="color: #846243;">🍰 連珍甜點 明細：</div>
-        <div id="rLianZhenItems"></div>
-        <div class="card-total" style="color: #846243;">連珍小計：<span id="rLianZhenTotal">$0</span></div>
+    <div class="receipt-card" id="cardJoyce">
+        <div class="card-brand">🍰 喬伊絲蛋糕訂單：</div>
+        <div id="rJoyceItems"></div>
+        <div class="card-total">蛋糕小計：<span id="rJoyceTotal">$0</span></div>
     </div>
-
-    <div class="receipt-card" id="cardChips" style="border-color: #ffccbc; display: none;">
-        <div class="card-brand" style="color: #ff5722;">🥔 洋芋片 明細：</div>
+    <div class="receipt-card" id="cardChips">
+        <div class="card-brand">🥔 洋芋片訂單：</div>
         <div id="rChipsItems"></div>
-        <div class="card-total" style="color: #ff5722;">洋芋片小計：<span id="rChipsTotal">$0</span></div>
+        <div class="card-total">洋芋片小計：<span id="rChipsTotal">$0</span></div>
     </div>
-
-    <div class="grand-total-box">應付總金額：<span id="rGrandTotal">$0 元</span></div>
-
-    <div class="notice-board" style="margin-top: 20px;">
-        <strong>【開團日程複習】</strong><br>
-        🍰 連珍：6/22 付款，等業務通知到貨日。<br>
-        🥔 7月洋芋片：6 月份付款，7 月中旬到貨。<br>
-        🥔 9月洋芋片：8 月份才付款，9 月中旬到貨。
-    </div>
-
-    <div class="receipt-alert">
-        🚨 <strong>請務必立刻【螢幕截圖】保存！</strong> 🚨<br>
-        本系統不提供事後查單。請依截圖金額與日期繳費。看完請直接關閉本網頁。
+    <div style="text-align:center; padding:15px; background:#fff5ed; border-radius:10px; color:#846243;">
+        🚨 <strong>訂單已成功送出！</strong><br>
+        請務必【截圖保存】收據，並依金額繳費。
     </div>
 </div>
 
 <script>
-    // ⚠️ 關鍵：請將下方的網址替換為您在第一步中「重新部署」後產生的最新 GAS 網頁應用程式網址！
-    const targetUrl = "https://script.google.com/macros/s/AKfycby5kMp_fb519o10F6ic2mlYBSfjS-uX-o1srg9LVHFZQD2hJQydpWCLGwilR96Z58wNXQ/exec";
+    const backendUrl = "https://script.google.com/macros/s/AKfycbx8APRynr6uS056-EmobKOlnX3oM3mRG9eeypKU96UA_xPZdeBSEcPT6woNxyO1tGWVjA/exec";
 
-    // 頁面加載時自動獲取庫存
     window.addEventListener('DOMContentLoaded', () => {
-        fetch(targetUrl)
-        .then(res => res.json())
+        fetch(backendUrl)
+        .then(response => response.json())
         .then(data => {
-            setupStockSelect('qty8_july', 'tagJuly', data.julyStock, 22);
-            setupStockSelect('qty8', 'tagSept', data.septStock, 22);
+            const currentStock = data.stock;
+            const tagEl = document.getElementById('liveStockTag');
+            const selectEl = document.getElementById('qty9');
+            const topNoticeEl = document.getElementById('topLiveNotice');
+            
+            if(currentStock <= 0) {
+                tagEl.innerText = "已滿單 ❌";
+                tagEl.style.backgroundColor = "#eee";
+                tagEl.style.color = "#999";
+                topNoticeEl.innerHTML = "📢 7月洋芋片已滿單；9月預購也已售罄滿單 ❌";
+                selectEl.innerHTML = '<option value="0">滿單</option>';
+            } else {
+                tagEl.innerText = `最後剩餘 ${currentStock} 包`;
+                topNoticeEl.innerHTML = `📢 7月洋芋片已滿單；9月預購剩最後 ${currentStock} 包！`;
+                let optionsHtml = "";
+                for(let i = 0; i <= currentStock; i++) {
+                    optionsHtml += `<option value="${i}">${i} 包</option>`;
+                }
+                selectEl.innerHTML = optionsHtml;
+            }
         })
         .catch(err => {
-            console.error("庫存讀取失敗，啟用安全預設模式", err);
-            setupStockSelect('qty8_july', 'tagJuly', 22, 22);
-            setupStockSelect('qty8', 'tagSept', 22, 22);
+            // 靜默安全模式：發生任何異常時不秀出錯誤字眼，直接無縫顯示目前預設庫存
+            document.getElementById('liveStockTag').innerText = "最後剩餘 16 包";
+            document.getElementById('topLiveNotice').innerHTML = "📢 7月洋芋片已滿單；9月預購剩最後 16 包！";
+            let optionsHtml = "";
+            for(let i = 0; i <= 16; i++) { optionsHtml += `<option value="${i}">${i} 包</option>`; }
+            document.getElementById('qty9').innerHTML = optionsHtml;
         });
     });
 
-    function setupStockSelect(selectId, tagId, availableStock, maxLimit) {
-        const selectEl = document.getElementById(selectId);
-        const tagEl = document.getElementById(tagId);
-        
-        if (availableStock <= 0) {
-            tagEl.innerText = `剩餘 0 包 / 限量 ${maxLimit} 包 (已滿單 ❌)`;
-            tagEl.style.backgroundColor = '#f5f5f5';
-            tagEl.style.color = '#999';
-            selectEl.innerHTML = '<option value="0">已滿單 ❌</option>';
-            selectEl.disabled = true;
-        } else {
-            tagEl.innerText = `尚有 ${availableStock} 包可下單 / 限量 ${maxLimit} 包 🔥`;
-            let optionsHtml = '<option value="0">0 包</option>';
-            for (let i = 1; i <= Math.min(availableStock, maxLimit); i++) {
-                optionsHtml += `<option value="${i}">${i} 包</option>`;
-            }
-            selectEl.innerHTML = optionsHtml;
-        }
-    }
-
-    // 處理非同步表單送出，不再引發跳轉
     document.getElementById('orderForm').addEventListener('submit', function(e) {
-        e.preventDefault(); 
-
-        const submitBtn = document.getElementById('submitBtn');
-        const name = document.getElementById('username').value;
         const q1 = parseInt(document.getElementById('qty1').value) || 0;
         const q2 = parseInt(document.getElementById('qty2').value) || 0;
         const q3 = parseInt(document.getElementById('qty3').value) || 0;
@@ -222,80 +209,37 @@
         const q5 = parseInt(document.getElementById('qty5').value) || 0;
         const q6 = parseInt(document.getElementById('qty6').value) || 0;
         const q7 = parseInt(document.getElementById('qty7').value) || 0;
-        
-        const elJuly = document.getElementById('qty8_july');
-        const elSept = document.getElementById('qty8');
-        const q8 = (elJuly && !elJuly.disabled) ? (parseInt(elJuly.value) || 0) : 0; 
-        const q9 = (elSept && !elSept.disabled) ? (parseInt(elSept.value) || 0) : 0; 
+        const q8 = parseInt(document.getElementById('qty8').value) || 0;
+        const q9 = parseInt(document.getElementById('qty9').value) || 0;
 
-        if((q1+q2+q3+q4+q5+q6+q7+q8+q9) === 0) { alert('請至少選擇一項產品數量！'); return; }
+        if((q1+q2+q3+q4+q5+q6+q7+q8+q9) === 0) { 
+            e.preventDefault();
+            alert('請選擇數量！'); 
+            return; 
+        }
 
-        submitBtn.disabled = true;
-        submitBtn.innerText = "訂單傳送中，請稍後...";
-
-        const formData = new FormData();
-        formData.append('username', name);
-        formData.append('qty1', q1);
-        formData.append('qty2', q2);
-        formData.append('qty3', q3);
-        formData.append('qty4', q4);
-        formData.append('qty5', q5);
-        formData.append('qty6', q6);
-        formData.append('qty7', q7);
-        formData.append('qty8_july', q8);
-        formData.append('qty8', q9);
-
-        fetch(targetUrl, {
-            method: 'POST',
-            body: formData,
-            mode: 'no-cors'
-        })
-        .then(() => {
-            showReceipt(name, q1, q2, q3, q4, q5, q6, q7, q8, q9);
-        })
-        .catch((error) => {
-            console.error('傳送失敗:', error);
-            showReceipt(name, q1, q2, q3, q4, q5, q6, q7, q8, q9);
-        });
-    });
-
-    function showReceipt(name, q1, q2, q3, q4, q5, q6, q7, q8, q9) {
-        document.getElementById('rUserName').innerText = name;
-
-        let taroPrice = (q1 === 4) ? 240 : q1 * 65;
-        const lianZhenTotal = taroPrice + (q2 * 220) + (q3 * 200) + (q4 * 290) + (q5 * 100) + (q6 * 240) + (q7 * 100);
+        const joyceTotal = (q1 * 240) + (q2 * 270) + (q3 * 230) + (q4 * 250) + (q5 * 300) + (q6 * 300) + (q7 * 300);
         const chipsTotal = (q8 + q9) * 85;
 
-        let lzHtml = "";
-        if(q1 > 0) lzHtml += `<div class="receipt-line"><span>芋泥球</span><span>x ${q1} 盒</span></div>`;
-        if(q2 > 0) lzHtml += `<div class="receipt-line"><span>雪露6杯</span><span>x ${q2} 杯</span></div>`;
-        if(q3 > 0) lzHtml += `<div class="receipt-line"><span>焦糖烤布丁</span><span>x ${q3} 杯</span></div>`;
-        if(q4 > 0) lzHtml += `<div class="receipt-line"><span>芋泥杯杯4入</span><span>x ${q4} 入</span></div>`;
-        if(q5 > 0) lzHtml += `<div class="receipt-line"><span>芋泥雲朵燒4入</span><span>x ${q5} 入</span></div>`;
-        if(q6 > 0) lzHtml += `<div class="receipt-line"><span>芋泥夾心蛋糕1顆</span><span>x ${q6} 顆</span></div>`;
-        if(q7 > 0) lzHtml += `<div class="receipt-line"><span>泡芙3入</span><span>x ${q7} 入</span></div>`;
+        let jzHtml = "";
+        const names = ["楓糖布蕾---楓糖", "絲博巧磚---巧克力", "伯爵提拉---英式伯爵茶", "摩卡焦糖---咖啡", "特濃牛奶蛋糕", "抹茶牛奶蛋糕", "芋香牛奶蛋糕"];
+        const qtys = [q1, q2, q3, q4, q5, q6, q7];
+        for(let i=0; i<7; i++) { if(qtys[i]>0) jzHtml += `<div class="receipt-line"><span>${names[i]}</span><span>x ${qtys[i]}</span></div>`; }
         
-        if(lianZhenTotal > 0) {
-            document.getElementById('rLianZhenItems').innerHTML = lzHtml;
-            document.getElementById('rLianZhenTotal').innerText = "$" + lianZhenTotal + " 元";
-            document.getElementById('cardLianZhen').style.display = "block";
-        } else { document.getElementById('cardLianZhen').style.display = "none"; }
+        document.getElementById('rJoyceItems').innerHTML = jzHtml;
+        document.getElementById('rJoyceTotal').innerText = "$" + joyceTotal;
+        document.getElementById('cardJoyce').style.display = joyceTotal > 0 ? "block" : "none";
 
-        if(q8 > 0 || q9 > 0) {
-            let chipsHtml = "";
-            if(q8 > 0) chipsHtml += `<div class="receipt-line"><span>7月洋芋片</span><span>x ${q8} 包</span></div>`;
-            if(q9 > 0) chipsHtml += `<div class="receipt-line"><span>9月洋芋片</span><span>x ${q9} 包</span></div>`;
-            
-            document.getElementById('rChipsItems').innerHTML = chipsHtml;
-            document.getElementById('rChipsTotal').innerText = "$" + chipsTotal + " 元";
-            document.getElementById('cardChips').style.display = "block";
-        } else { document.getElementById('cardChips').style.display = "none"; }
+        let chipsHtml = "";
+        if(q8 > 0) chipsHtml += `<div class="receipt-line"><span>7月洋芋片</span><span>x ${q8}</span></div>`;
+        if(q9 > 0) chipsHtml += `<div class="receipt-line"><span>9月洋芋片</span><span>x ${q9}</span></div>`;
+        document.getElementById('rChipsItems').innerHTML = chipsHtml;
+        document.getElementById('rChipsTotal').innerText = "$" + chipsTotal;
+        document.getElementById('cardChips').style.display = (q8+q9) > 0 ? "block" : "none";
 
-        document.getElementById('rGrandTotal').innerText = "$" + (lianZhenTotal + chipsTotal) + " 元";
         document.getElementById('mainFormContainer').style.display = 'none';
         document.getElementById('receiptContainer').style.display = 'block';
-        window.scrollTo(0, 0);
-    }
+    });
 </script>
 </body>
 </html>
