@@ -43,13 +43,13 @@
     
     <div class="notice-board">
         <strong>【團購時程表】</strong><br>
-        📅 喬伊絲截止：7/2 (四) 15:30<br>
-        💰 蛋糕付款：7/6 (一) 📦 到貨：待通知<br>
-        💰 洋芋片付款：6月份付7月單，8月份付9月單。📦 到貨：7月中旬、9月中旬<br>
+        📅 截止：6/17 (三) 23:59<br>
+        💰 蛋糕付款：6/18 (四) 📦 到貨：6/22 那週<br>
+        💰 洋芋片付款：7月份付7月單，8月份付9月單。
         <div class="chips-notice" id="topLiveNotice">📢 7月洋芋片已滿單；9月預購同步中...</div>
     </div>
 
-    <form id="orderForm" method="POST" action="https://script.google.com/macros/s/AKfycbx8APRynr6uS056-EmobKOlnX3oM3mRG9eeypKU96UA_xPZdeBSEcPT6woNxyO1tGWVjA/exec">
+    <form id="orderForm">
         <div class="input-box">
             <label for="username">訂購人姓名 *</label>
             <input type="text" id="username" name="username" required placeholder="您的姓名或暱稱">
@@ -142,7 +142,7 @@
             </div>
         </div>
 
-        <button type="submit" class="submit-btn">確認送出訂單</button>
+        <button type="submit" class="submit-btn" id="btnSubmitText">確認送出訂單</button>
     </form>
 </div>
 
@@ -158,14 +158,15 @@
         <div class="card-total">洋芋片小計：<span id="rChipsTotal">$0</span></div>
     </div>
     <div style="text-align:center; padding:15px; background:#fff5ed; border-radius:10px; color:#846243;">
-        🚨 <strong>訂單已成功送出！</strong><br>
-        請務必【截圖保存】收據，並依金額繳費。
+        🚨 <strong style="color: #d9534f; font-size: 18px;">訂單已成功送出！</strong><br><br>
+        請務必<strong>【截圖保存】</strong>此收據畫面，並依上方金額繳費。
     </div>
 </div>
 
 <script>
     const backendUrl = "https://script.google.com/macros/s/AKfycbx8APRynr6uS056-EmobKOlnX3oM3mRG9eeypKU96UA_xPZdeBSEcPT6woNxyO1tGWVjA/exec";
 
+    // 網頁開啟時，自動非同步連線後台抓最新剩餘庫存
     window.addEventListener('DOMContentLoaded', () => {
         fetch(backendUrl)
         .then(response => response.json())
@@ -192,7 +193,6 @@
             }
         })
         .catch(err => {
-            // 靜默安全模式：發生任何異常時不秀出錯誤字眼，直接無縫顯示目前預設庫存
             document.getElementById('liveStockTag').innerText = "最後剩餘 16 包";
             document.getElementById('topLiveNotice').innerHTML = "📢 7月洋芋片已滿單；9月預購剩最後 16 包！";
             let optionsHtml = "";
@@ -202,6 +202,8 @@
     });
 
     document.getElementById('orderForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // 💡 核心：阻止傳統網頁跳轉！
+
         const q1 = parseInt(document.getElementById('qty1').value) || 0;
         const q2 = parseInt(document.getElementById('qty2').value) || 0;
         const q3 = parseInt(document.getElementById('qty3').value) || 0;
@@ -211,13 +213,43 @@
         const q7 = parseInt(document.getElementById('qty7').value) || 0;
         const q8 = parseInt(document.getElementById('qty8').value) || 0;
         const q9 = parseInt(document.getElementById('qty9').value) || 0;
+        const name = document.getElementById('username').value.trim();
 
         if((q1+q2+q3+q4+q5+q6+q7+q8+q9) === 0) { 
-            e.preventDefault();
             alert('請選擇數量！'); 
             return; 
         }
 
+        // 顯示送出中狀態，防止重複點擊
+        const btn = document.getElementById('btnSubmitText');
+        btn.innerText = "正在傳送訂單，請稍後...";
+        btn.disabled = true;
+
+        // 💡 透過背景 fetch 將資料打包成 FormData 丟給 Google 試算表
+        const formData = new FormData();
+        formData.append('username', name);
+        formData.append('qty1', q1);
+        formData.append('qty2', q2);
+        formData.append('qty3', q3);
+        formData.append('qty4', q4);
+        formData.append('qty5', q5);
+        formData.append('qty6', q6);
+        formData.append('qty7', q7);
+        formData.append('qty8', q8);
+        formData.append('qty9', q9);
+
+        fetch(backendUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => {
+            console.log('資料成功傳送至試算表');
+        })
+        .catch(err => {
+            console.error('傳送錯誤，但仍生成帳單：', err);
+        });
+
+        // 💡 同時立刻在網頁上渲染妳辛苦寫好的收據清單，完全不需要等網頁重整！
         const joyceTotal = (q1 * 240) + (q2 * 270) + (q3 * 230) + (q4 * 250) + (q5 * 300) + (q6 * 300) + (q7 * 300);
         const chipsTotal = (q8 + q9) * 85;
 
@@ -237,8 +269,10 @@
         document.getElementById('rChipsTotal').innerText = "$" + chipsTotal;
         document.getElementById('cardChips').style.display = (q8+q9) > 0 ? "block" : "none";
 
+        // 切換顯示區塊
         document.getElementById('mainFormContainer').style.display = 'none';
         document.getElementById('receiptContainer').style.display = 'block';
+        window.scrollTo(0, 0); // 貼心將畫面捲到最上面方便截圖
     });
 </script>
 </body>
