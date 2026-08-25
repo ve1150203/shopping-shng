@@ -58,7 +58,7 @@
                 </tbody>
             </table>
 
-            <div class="total-box">目前試算總額：NT$ <span id="totalAmount">0</span></div>
+            <div class="total-box">目前追加試算金額：NT$ <span id="totalAmount">0</span></div>
 
             <div class="form-group">
                 <label>姓名 *</label>
@@ -69,7 +69,7 @@
                 <input type="password" id="password" required placeholder="設定 4 位數以上密碼">
             </div>
 
-            <button type="submit" class="btn" id="submitBtn">送出訂單</button>
+            <button type="submit" class="btn" id="submitBtn">送出訂單（若已有舊訂單將自動累加）</button>
         </form>
     </div>
 
@@ -88,7 +88,7 @@
 
         <div id="queryResult" style="margin-top:20px; display:none;">
             <hr>
-            <h4>您的訂購紀錄（可調整數量後儲存）：</h4>
+            <h4>您的訂購紀錄（可調整數量或刪除後儲存）：</h4>
             
             <table>
                 <thead>
@@ -201,6 +201,7 @@
         });
     }
 
+    // 線上訂購表單提交（預設為：自動合併追加模式）
     document.getElementById('orderForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
@@ -232,19 +233,20 @@
             body: JSON.stringify({
                 name: document.getElementById('name').value.trim(),
                 password: document.getElementById('password').value.trim(),
-                items: orderItems
+                items: orderItems,
+                isEditMode: false // 告訴後端：這是加單/累加模式
             })
         })
         .then(res => res.json())
         .then(data => {
             alert(data.message);
             if(data.status === 'success') location.reload();
-            else { btn.disabled = false; btn.textContent = '送出訂單'; }
+            else { btn.disabled = false; btn.textContent = '送出訂單（若已有舊訂單將自動累加）'; }
         })
         .catch(err => {
             alert('連線異常，請重試。');
             btn.disabled = false;
-            btn.textContent = '送出訂單';
+            btn.textContent = '送出訂單（若已有舊訂單將自動累加）';
         });
     });
 
@@ -275,9 +277,6 @@
                     const isSoldOut = item.stock <= 0;
                     const subInfo = [item.id, item.spec].filter(Boolean).join(' | ');
 
-                    // 計算修改限制 (Max)
-                    // 若完售：原本沒訂的人不能訂(disabled)；原本有訂的人，最多只能選原本的數量(只能減不能加)
-                    // 若未完售：最多可選「原本已訂數量 + 剩餘庫存」
                     let maxAllowed = currentQty + item.stock;
                     let isDisabled = false;
                     let hintText = '';
@@ -322,6 +321,7 @@
             });
     });
 
+    // 儲存修改表單提交（為：覆蓋修正模式）
     document.getElementById('btnSaveEdit').addEventListener('click', function() {
         const btn = document.getElementById('btnSaveEdit');
         const name = document.getElementById('q-name').value.trim();
@@ -349,7 +349,8 @@
             body: JSON.stringify({
                 name: name,
                 password: password,
-                items: orderItems
+                items: orderItems,
+                isEditMode: true // 告訴後端：這是覆蓋修正模式
             })
         })
         .then(res => res.json())
