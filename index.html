@@ -26,8 +26,9 @@
         .btn-secondary { background: #2980b9; }
         .btn:disabled { background: #95a5a6; cursor: not-allowed; }
         .total-box { text-align: right; font-size: 1.2rem; font-weight: bold; color: #c0392b; margin: 15px 0; }
-        .prod-title { font-size: 1.05rem; font-weight: bold; color: #2c3e50; }
+        .prod-title { font-size: 1.1rem; font-weight: bold; color: #2c3e50; }
         .prod-sub { font-size: 0.85rem; color: #7f8c8d; }
+        .limit-hint { font-size: 0.8rem; color: #d9534f; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -72,7 +73,7 @@
         </form>
     </div>
 
-    <!-- 頁籤二：查詢與改單 -->
+    <!-- 頁籤二：查詢與修改訂單 -->
     <div id="tab-query" class="tab-content" style="display:none;">
         <h3>個人金額與修改訂單</h3>
         <div class="form-group">
@@ -87,14 +88,14 @@
 
         <div id="queryResult" style="margin-top:20px; display:none;">
             <hr>
-            <h4>您的訂購紀錄（可直接加減數量進行改單）：</h4>
+            <h4>您的訂購紀錄（可調整數量後儲存）：</h4>
             
             <table>
                 <thead>
                     <tr>
                         <th>品名 / 規格</th>
                         <th style="width: 80px;">單價</th>
-                        <th style="width: 80px;">訂購數量</th>
+                        <th style="width: 90px;">訂購數量</th>
                     </tr>
                 </thead>
                 <tbody id="editProductList"></tbody>
@@ -110,7 +111,6 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyDSTHRdKfXTxmNQJ3s3IzPLnBb7CAIfGUGffdKCCj8dV0z4QeJoPWd-MoUJPp8dU92/exec";
     let globalProducts = [];
 
-    // 載入商品列表
     function loadData() {
         fetch(GAS_URL, { method: "GET", redirect: "follow" })
             .then(res => res.json())
@@ -125,7 +125,6 @@
             });
     }
 
-    // 渲染線上訂購表格 (品名加大、品號規格放底下)
     function renderOrderTable(products) {
         const list = document.getElementById('productList');
         list.innerHTML = '';
@@ -149,7 +148,6 @@
                 buyerDetails = '<div class="detail-list" style="color:#888;">🛒 尚無人預訂</div>';
             }
 
-            // 品號與規格組合在小字呈現
             const subInfo = [item.id, item.spec].filter(Boolean).join(' | ');
 
             tr.innerHTML = `
@@ -170,13 +168,23 @@
         bindCalcEvents('.order-qty', 'totalAmount');
     }
 
-    // 即時計算總金額事件
     function bindCalcEvents(inputSelector, totalSpanId) {
         const inputs = document.querySelectorAll(inputSelector);
         inputs.forEach(inp => {
             const handleUpdate = () => {
                 let val = parseInt(inp.value) || 0;
-                if (val < 0) val = 0;
+                const min = parseInt(inp.getAttribute('min')) || 0;
+                const maxAttr = inp.getAttribute('max');
+                
+                if (val < min) val = min;
+                if (maxAttr !== null && maxAttr !== "") {
+                    const max = parseInt(maxAttr);
+                    if (val > max) {
+                        alert(`此品項最多只能選擇 ${max} 件！`);
+                        val = max;
+                    }
+                }
+                
                 inp.value = val;
 
                 let total = 0;
@@ -193,7 +201,6 @@
         });
     }
 
-    // 新增訂單送出
     document.getElementById('orderForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
@@ -230,14 +237,9 @@
         })
         .then(res => res.json())
         .then(data => {
-            if(data.status === 'success') {
-                alert(data.message);
-                location.reload();
-            } else {
-                alert('失敗：' + data.message);
-                btn.disabled = false;
-                btn.textContent = '送出訂單';
-            }
+            alert(data.message);
+            if(data.status === 'success') location.reload();
+            else { btn.disabled = false; btn.textContent = '送出訂單'; }
         })
         .catch(err => {
             alert('連線異常，請重試。');
@@ -246,7 +248,7 @@
         });
     });
 
-    // 驗證並載入個人改單頁面
+    // 驗證並載入修改頁籤
     document.getElementById('btnQuery').addEventListener('click', function() {
         const name = document.getElementById('q-name').value.trim();
         const password = document.getElementById('q-password').value.trim();
@@ -270,17 +272,40 @@
 
                 globalProducts.forEach((item, index) => {
                     const currentQty = userItems[item.name] || 0;
+                    const isSoldOut = item.stock <= 0;
                     const subInfo = [item.id, item.spec].filter(Boolean).join(' | ');
 
+                    // 計算修改限制 (Max)
+                    // 若完售：原本沒訂的人不能訂(disabled)；原本有訂的人，最多只能選原本的數量(只能減不能加)
+                    // 若未完售：最多可選「原本已訂數量 + 剩餘庫存」
+                    let maxAllowed = currentQty + item.stock;
+                    let isDisabled = false;
+                    let hintText = '';
+
+                    if (isSoldOut) {
+                        if (currentQty === 0) {
+                            isDisabled = true;
+                            hintText = '<div class="limit-hint">已完售</div>';
+                        } else {
+                            maxAllowed = currentQty;
+                            hintText = `<div class="limit-hint">已完售（僅能減少，最多${currentQty}件）</div>`;
+                        }
+                    } else {
+                        hintText = `<div class="limit-hint">上限 ${maxAllowed} 件 (含庫存)</div>`;
+                    }
+
                     const tr = document.createElement('tr');
+                    if(isDisabled) tr.classList.add('disabled-row');
+
                     tr.innerHTML = `
                         <td>
                             <div class="prod-title">${item.name}</div>
                             <div class="prod-sub">${subInfo}</div>
+                            ${hintText}
                         </td>
                         <td class="price">NT$ ${item.price}</td>
                         <td>
-                            <input type="number" class="qty-input edit-qty" data-index="${index}" min="0" step="1" value="${currentQty}">
+                            <input type="number" class="qty-input edit-qty" data-index="${index}" min="0" max="${maxAllowed}" step="1" value="${currentQty}" ${isDisabled ? 'disabled' : ''}>
                         </td>
                     `;
                     list.appendChild(tr);
@@ -289,7 +314,6 @@
                 document.getElementById('queryResult').style.display = 'block';
                 bindCalcEvents('.edit-qty', 'myTotal');
                 
-                // 觸發一次總額計算
                 const firstInput = document.querySelector('.edit-qty');
                 if(firstInput) firstInput.dispatchEvent(new Event('change'));
             })
@@ -298,7 +322,6 @@
             });
     });
 
-    // 儲存修改後的訂單
     document.getElementById('btnSaveEdit').addEventListener('click', function() {
         const btn = document.getElementById('btnSaveEdit');
         const name = document.getElementById('q-name').value.trim();
@@ -331,14 +354,9 @@
         })
         .then(res => res.json())
         .then(data => {
-            if(data.status === 'success') {
-                alert('訂單修改成功！');
-                location.reload();
-            } else {
-                alert('修改失敗：' + data.message);
-                btn.disabled = false;
-                btn.textContent = '儲存 / 覆蓋修改訂單';
-            }
+            alert(data.message);
+            if(data.status === 'success') location.reload();
+            else { btn.disabled = false; btn.textContent = '儲存 / 覆蓋修改訂單'; }
         })
         .catch(err => {
             alert('系統連線異常，請再試一次。');
