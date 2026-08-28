@@ -134,7 +134,7 @@
         }
 
         products.forEach((item, index) => {
-            if (item.isWebShow === false) return; // 隱藏私下箱購[cite: 1]
+            if (item.isWebShow === false) return;
 
             const isSoldOut = item.stock <= 0;
             const tr = document.createElement('tr');
@@ -224,7 +224,7 @@
             body: JSON.stringify({
                 name: document.getElementById('name').value.trim(),
                 password: document.getElementById('password').value.trim(),
-                isOverwrite: false, // 累加模式，不會吃掉未填的舊品項
+                isOverwrite: false,
                 items: orderItems
             })
         })
@@ -246,7 +246,7 @@
         });
     });
 
-    // 驗證並載入個人改單頁面
+    // 驗證並載入個人改單頁面（包含完售防呆與鎖定）
     document.getElementById('btnQuery').addEventListener('click', function() {
         const name = document.getElementById('q-name').value.trim();
         const password = document.getElementById('q-password').value.trim();
@@ -269,25 +269,38 @@
                 list.innerHTML = '';
 
                 globalProducts.forEach((item, index) => {
-                    if (item.isWebShow === false) return; // 隱藏私下箱購[cite: 1]
+                    if (item.isWebShow === false) return;
 
                     const currentQty = userItems[item.name] || 0;
                     const subInfo = item.spec || '-';
                     const isSoldOut = item.stock <= 0;
 
-                    // 完售限制：若完售，上限鎖定為原本已訂數量（只能改小或維持，不能改大）
-                    const maxAllowed = isSoldOut ? currentQty : (currentQty + item.stock);
+                    let inputHTML = '';
+
+                    if (isSoldOut) {
+                        if (currentQty > 0) {
+                            // 情況 1：已完售，但原本有訂購 ➔ 只能改小或維持，max 鎖死為原本數量（無法追加）
+                            inputHTML = `<input type="number" class="qty-input edit-qty" data-index="${index}" min="0" max="${currentQty}" step="1" value="${currentQty}">`;
+                        } else {
+                            // 情況 2：已完售，且原本沒訂購 ➔ 直接鎖住（disabled）
+                            inputHTML = `<input type="number" class="qty-input edit-qty" data-index="${index}" value="0" disabled>`;
+                        }
+                    } else {
+                        // 情況 3：未完售 ➔ 正常可加減，最大上限為 (原本數量 + 剩餘庫存)
+                        const maxAllowed = currentQty + item.stock;
+                        inputHTML = `<input type="number" class="qty-input edit-qty" data-index="${index}" min="0" max="${maxAllowed}" step="1" value="${currentQty}">`;
+                    }
 
                     const tr = document.createElement('tr');
+                    if (isSoldOut && currentQty === 0) tr.classList.add('disabled-row');
+
                     tr.innerHTML = `
                         <td>
-                            <div class="prod-title">${item.name}</div>
+                            <div class="prod-title">${item.name} ${isSoldOut ? '<span class="sold-out">(已完售)</span>' : ''}</div>
                             <div class="prod-sub">${subInfo}</div>
                         </td>
                         <td class="price">NT$ ${item.price}</td>
-                        <td>
-                            <input type="number" class="qty-input edit-qty" data-index="${index}" min="0" max="${maxAllowed}" step="1" value="${currentQty}">
-                        </td>
+                        <td>${inputHTML}</td>
                     `;
                     list.appendChild(tr);
                 });
@@ -295,7 +308,7 @@
                 document.getElementById('queryResult').style.display = 'block';
                 bindCalcEvents('.edit-qty', 'myTotal');
                 
-                const firstInput = document.querySelector('.edit-qty');
+                const firstInput = document.querySelector('.edit-qty:not([disabled])');
                 if(firstInput) firstInput.dispatchEvent(new Event('change'));
             })
             .catch(err => {
@@ -312,6 +325,7 @@
         let orderItems = [];
 
         inputs.forEach(i => {
+            if (i.disabled) return; // 鎖住的品項跳過
             const qty = parseInt(i.value) || 0;
             const idx = i.getAttribute('data-index');
             orderItems.push({
@@ -330,7 +344,7 @@
             body: JSON.stringify({
                 name: name,
                 password: password,
-                isOverwrite: true, // 覆蓋模式
+                isOverwrite: true,
                 items: orderItems
             })
         })
