@@ -110,7 +110,6 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyDSTHRdKfXTxmNQJ3s3IzPLnBb7CAIfGUGffdKCCj8dV0z4QeJoPWd-MoUJPp8dU92/exec";
     let globalProducts = [];
 
-    // 載入商品列表
     function loadData() {
         fetch(GAS_URL, { method: "GET", redirect: "follow" })
             .then(res => res.json())
@@ -125,7 +124,6 @@
             });
     }
 
-    // 渲染線上訂購表格 (品名加大、品號規格放底下，並保留訂購人清單)
     function renderOrderTable(products) {
         const list = document.getElementById('productList');
         list.innerHTML = '';
@@ -136,8 +134,7 @@
         }
 
         products.forEach((item, index) => {
-            // 關鍵過濾：不是網頁上架商品（私下箱購）直接跳過[cite: 1]
-            if (item.isWebShow === false) return;
+            if (item.isWebShow === false) return; // 隱藏私下箱購[cite: 1]
 
             const isSoldOut = item.stock <= 0;
             const tr = document.createElement('tr');
@@ -152,7 +149,6 @@
                 buyerDetails = '<div class="detail-list" style="color:#888;">🛒 尚無人預訂</div>';
             }
 
-            // spec 已由 GAS 後端組合好品號與規格（A欄 | C欄）
             const subInfo = item.spec || '-';
 
             tr.innerHTML = `
@@ -173,7 +169,6 @@
         bindCalcEvents('.order-qty', 'totalAmount');
     }
 
-    // 即時計算總金額事件
     function bindCalcEvents(inputSelector, totalSpanId) {
         const inputs = document.querySelectorAll(inputSelector);
         inputs.forEach(inp => {
@@ -196,7 +191,7 @@
         });
     }
 
-    // 新增訂單送出
+    // 新增/累加訂單送出
     document.getElementById('orderForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
@@ -208,7 +203,7 @@
             const idx = i.getAttribute('data-index');
             if(qty > 0) {
                 orderItems.push({
-                    id: globalProducts[idx].name, // 送給 GAS 的商品識別 ID
+                    id: globalProducts[idx].name,
                     name: globalProducts[idx].name,
                     price: globalProducts[idx].price,
                     qty: qty
@@ -229,13 +224,14 @@
             body: JSON.stringify({
                 name: document.getElementById('name').value.trim(),
                 password: document.getElementById('password').value.trim(),
+                isOverwrite: false, // 累加模式，不會吃掉未填的舊品項
                 items: orderItems
             })
         })
         .then(res => res.json())
         .then(data => {
             if(data.status === 'success') {
-                alert('訂單已成功送出！');
+                alert('訂單已成功送出與累加！');
                 location.reload();
             } else {
                 alert('失敗：' + data.message);
@@ -279,7 +275,7 @@
                     const subInfo = item.spec || '-';
                     const isSoldOut = item.stock <= 0;
 
-                    // 完售防呆：若已完售，最多只能選擇原本已訂購的數量（只能減少不能加購）
+                    // 完售限制：若完售，上限鎖定為原本已訂數量（只能改小或維持，不能改大）
                     const maxAllowed = isSoldOut ? currentQty : (currentQty + item.stock);
 
                     const tr = document.createElement('tr');
@@ -299,7 +295,6 @@
                 document.getElementById('queryResult').style.display = 'block';
                 bindCalcEvents('.edit-qty', 'myTotal');
                 
-                // 觸發一次總額計算
                 const firstInput = document.querySelector('.edit-qty');
                 if(firstInput) firstInput.dispatchEvent(new Event('change'));
             })
@@ -308,7 +303,7 @@
             });
     });
 
-    // 儲存修改後的訂單
+    // 覆蓋儲存修改後的訂單
     document.getElementById('btnSaveEdit').addEventListener('click', function() {
         const btn = document.getElementById('btnSaveEdit');
         const name = document.getElementById('q-name').value.trim();
@@ -319,14 +314,12 @@
         inputs.forEach(i => {
             const qty = parseInt(i.value) || 0;
             const idx = i.getAttribute('data-index');
-            if(qty >= 0) {
-                orderItems.push({
-                    id: globalProducts[idx].name,
-                    name: globalProducts[idx].name,
-                    price: globalProducts[idx].price,
-                    qty: qty
-                });
-            }
+            orderItems.push({
+                id: globalProducts[idx].name,
+                name: globalProducts[idx].name,
+                price: globalProducts[idx].price,
+                qty: qty
+            });
         });
 
         btn.disabled = true;
@@ -337,6 +330,7 @@
             body: JSON.stringify({
                 name: name,
                 password: password,
+                isOverwrite: true, // 覆蓋模式
                 items: orderItems
             })
         })
