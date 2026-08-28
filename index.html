@@ -3,36 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 中秋小小團</title>
+    <title>2026 中秋小小團 - 線上訂購系統</title>
     <style>
         body { font-family: "Microsoft JhengHei", Arial, sans-serif; margin: 0; padding: 15px; background-color: #f8f9fa; }
         .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: #333; margin-bottom: 20px; }
-        .user-info { display: flex; gap: 10px; margin-bottom: 20px; background: #eef2f5; padding: 15px; border-radius: 6px; }
-        .user-info input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .user-info { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: #eef2f5; padding: 15px; border-radius: 6px; }
+        .user-info input { flex: 1; min-width: 150px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-search { padding: 8px 15px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-search:hover { background: #2980b9; }
         .product-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
         .product-title { font-weight: bold; font-size: 1.05rem; color: #2c3e50; }
         .product-spec { font-size: 0.85rem; color: #7f8c8d; margin-top: 3px; }
         .price { color: #e67e22; font-weight: bold; width: 80px; text-align: right; }
-        .stock { width: 80px; text-align: center; font-size: 0.9rem; }
+        .stock { width: 90px; text-align: center; font-size: 0.9rem; }
         .qty-input { width: 60px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
         .sold-out { color: #e74c3c; font-weight: bold; }
         .btn-submit { width: 100%; padding: 12px; background: #27ae60; color: #fff; border: none; border-radius: 6px; font-size: 1.1rem; cursor: pointer; margin-top: 20px; }
         .btn-submit:hover { background: #219150; }
-        #loading { text-align: center; padding: 30px; font-size: 1.2rem; color: #666; }
+        #loading { text-align: center; padding: 20px; font-size: 1.1rem; color: #666; }
+        #statusMsg { font-size: 0.9rem; color: #27ae60; width: 100%; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>2026 中秋小小團</h2>
+    <h2>2026 中秋小小團 - 線上訂購系統</h2>
     
     <div class="user-info">
         <input type="text" id="userName" placeholder="請輸入姓名 (必填)" required>
-        <input type="password" id="userPassword" placeholder="設定查詢/修改密碼 (必填)" required>
+        <input type="password" id="userPassword" placeholder="密碼 (必填)" required>
+        <button type="button" class="btn-search" onclick="loadUserOrder()">載入舊訂單</button>
+        <div id="statusMsg"></div>
     </div>
 
-    <div id="loading">資料載入中，請稍候...</div>
+    <div id="loading">商品資料載入中，請稍候...</div>
     <div id="productList" style="display: none;"></div>
 
     <button type="button" class="btn-submit" onclick="submitOrder()">送出訂單</button>
@@ -41,47 +46,57 @@
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyDSTHRdKfXTxmNQJ3s3IzPLnBb7CAIfGUGffdKCCj8dV0z4QeJoPWd-MoUJPp8dU92/exec";
     let productData = [];
+    let currentUserItems = {}; // 紀錄使用者原本點的數量
 
     // 頁面載入時取得商品清單
     fetch(GAS_URL)
         .then(res => res.json())
         .then(data => {
             productData = data;
-            renderProducts(productData);
+            renderProducts();
         })
         .catch(err => {
             document.getElementById('loading').textContent = '資料載入失敗，請重新整理頁面！';
             console.error(err);
         });
 
-    function renderProducts(products) {
+    function renderProducts() {
         const listDiv = document.getElementById('productList');
         listDiv.innerHTML = '';
 
-        products.forEach(p => {
-            // 關鍵過濾：只要不是在「商品訂單」上架的商品（例如私下加購的阿根廷魷魚），就直接跳過不顯示！
-            if (!p.isWebShow) return;
+        productData.forEach(p => {
+            if (!p.isWebShow) return; // 隱藏私下箱購
 
             const itemDiv = document.createElement('div');
             itemDiv.className = 'product-item';
 
+            const userQty = currentUserItems[p.id] || 0; // 舊訂單數量
             const isSoldOut = p.stock <= 0;
-            const stockHTML = isSoldOut 
-                ? `<span class="sold-out">完售</span>` 
-                : `${p.stock}`;
+            
+            // 計算最大可選數量：完售時最高只能選原本的數量（只能減少不能增加）
+            const maxAllowed = isSoldOut ? userQty : (userQty + p.stock);
 
-            const inputHTML = isSoldOut
-                ? `<input type="number" class="qty-input" value="0" disabled>`
-                : `<input type="number" class="qty-input" id="qty_${p.id}" data-id="${p.id}" min="0" max="${p.stock}" value="0">`;
+            let stockHTML = `剩餘 ${p.stock}`;
+            if (isSoldOut) {
+                stockHTML = `<span class="sold-out">完售</span>`;
+            }
 
-            // 小字處精準顯示：品號 | 規格 (由 GAS 後端組合好的 p.spec)
+            let inputHTML = '';
+            if (isSoldOut && userQty === 0) {
+                // 完售且沒買過：停用
+                inputHTML = `<input type="number" class="qty-input" value="0" disabled>`;
+            } else {
+                // 買過或未完售：限制 max 只能選到 maxAllowed
+                inputHTML = `<input type="number" class="qty-input" id="qty_${p.id}" data-id="${p.id}" min="0" max="${maxAllowed}" value="${userQty}">`;
+            }
+
             itemDiv.innerHTML = `
                 <div style="flex: 1;">
                     <div class="product-title">${p.name}</div>
                     <div class="product-spec">${p.spec || '-'}</div>
                 </div>
                 <div class="price">NT$ ${p.price}</div>
-                <div class="stock">剩餘 ${stockHTML}</div>
+                <div class="stock">${stockHTML}</div>
                 <div>${inputHTML}</div>
             `;
 
@@ -92,6 +107,42 @@
         listDiv.style.display = 'block';
     }
 
+    // 載入舊訂單
+    function loadUserOrder() {
+        const name = document.getElementById('userName').value.trim();
+        const password = document.getElementById('userPassword').value.trim();
+
+        if (!name || !password) {
+            alert('請先輸入「姓名」與「密碼」！');
+            return;
+        }
+
+        document.getElementById('statusMsg').textContent = '正在查詢舊訂單...';
+
+        fetch(`${GAS_URL}?action=get_user_order&name=${encodeURIComponent(name)}&password=${encodeURIComponent(password)}`)
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    if (res.found) {
+                        currentUserItems = res.userItems;
+                        document.getElementById('statusMsg').textContent = '✓ 已成功載入您的舊訂單紀錄，可直接修改數量。';
+                    } else {
+                        currentUserItems = {};
+                        document.getElementById('statusMsg').textContent = 'ℹ 未找到舊紀錄，您可以直接進行第一次下單。';
+                    }
+                    renderProducts();
+                } else {
+                    alert('錯誤：' + res.message);
+                    document.getElementById('statusMsg').textContent = '';
+                }
+            })
+            .catch(err => {
+                alert('查詢失敗，請重試');
+                document.getElementById('statusMsg').textContent = '';
+            });
+    }
+
+    // 送出訂單
     function submitOrder() {
         const name = document.getElementById('userName').value.trim();
         const password = document.getElementById('userPassword').value.trim();
@@ -103,10 +154,20 @@
 
         const items = [];
         const inputs = document.querySelectorAll('.qty-input');
-        
+        let hasError = false;
+
         inputs.forEach(input => {
+            if (input.disabled) return;
             const qty = parseInt(input.value) || 0;
-            if (qty > 0) {
+            const max = parseInt(input.max) || 0;
+
+            if (qty > max) {
+                alert(`數量超出限制！該品項最多只能選擇 ${max} 件。`);
+                hasError = true;
+                return;
+            }
+
+            if (qty >= 0) {
                 items.push({
                     id: input.dataset.id,
                     qty: qty
@@ -114,10 +175,7 @@
             }
         });
 
-        if (items.length === 0) {
-            alert('請至少選擇一項商品的訂購數量！');
-            return;
-        }
+        if (hasError) return;
 
         const payload = {
             name: name,
@@ -126,7 +184,7 @@
         };
 
         document.getElementById('loading').style.display = 'block';
-        document.getElementById('loading').textContent = '訂單送出中，請稍候...';
+        document.getElementById('loading').textContent = '訂單處理中，請稍候...';
         document.getElementById('productList').style.display = 'none';
 
         fetch(GAS_URL, {
@@ -136,17 +194,19 @@
         .then(res => res.json())
         .then(res => {
             if (res.status === 'success') {
-                alert('訂單已成功送出！');
+                alert('訂單已成功送出與更新！');
                 location.reload();
             } else {
                 alert('失敗：' + res.message);
-                document.getElementById('loading').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('loading').textContent = '失敗：' + res.message;
                 document.getElementById('productList').style.display = 'block';
             }
         })
         .catch(err => {
-            alert('送出失敗，請檢查網路後重試！');
-            console.error(err);
+            alert('送出失敗，請檢查網路！');
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('productList').style.display = 'block';
         });
     }
 </script>
