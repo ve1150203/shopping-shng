@@ -8,6 +8,31 @@
         body { font-family: Arial, "Microsoft JhengHei", sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: #d9534f; margin-bottom: 20px; }
+        
+        /* 團購須知備註區塊 */
+        .notice-box {
+            background-color: #fdf7f7;
+            border: 1px solid #f5c6cb;
+            border-left: 5px solid #d9534f;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+        .notice-box h3 {
+            margin: 0 0 10px 0;
+            color: #d9534f;
+            font-size: 1.1rem;
+        }
+        .notice-box ul {
+            margin: 0;
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        .notice-box li {
+            font-size: 0.95rem;
+            color: #495057;
+        }
+
         .tab-btn { padding: 10px 20px; font-weight: bold; cursor: pointer; border: none; background: #e0e0e0; margin-right: 5px; border-radius: 5px 5px 0 0; }
         .tab-btn.active { background: #d9534f; color: white; }
         .tab-content { border: 1px solid #ccc; padding: 20px; border-radius: 0 5px 5px 5px; background: #fff; }
@@ -25,23 +50,31 @@
         .btn { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; font-size: 1rem; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
         .btn-secondary { background: #2980b9; }
         .btn:disabled { background: #95a5a6; cursor: not-allowed; }
-        .total-box { text-align: right; font-size: 1.2rem; font-weight: bold; color: #c0392b; margin: 15px 0; }
+        .total-box { text-align: right; font-size: 1.25rem; font-weight: bold; color: #c0392b; margin: 15px 0; }
         .prod-title { font-size: 1.05rem; font-weight: bold; color: #2c3e50; }
         .prod-sub { font-size: 0.85rem; color: #7f8c8d; }
+        .lock-notice { background: #fff3cd; color: #856404; padding: 10px; border-radius: 4px; font-weight: bold; margin-bottom: 15px; border: 1px solid #ffeeba; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>2026 中秋小小團</h1>
-<BR>
-<h3>到貨日：9/23（三）下午
-	<br>
-	付款日：9/16（三）~9/22（二）下午三點半止</h3>
-	<h5 style="color: #722F37;">僅接受『現金付款』，到貨當日，請大家自備保冷袋，不再提供塑膠袋。</h5>
+
+    <!-- 團購須知備註區塊 -->
+    <div class="notice-box">
+        <h3>📌 訂購與領取注意事項</h3>
+        <ul>
+            <li><strong>到貨日：</strong>9/23（三）下午</li>
+            <li><strong>付款日：</strong>9/16（三）~ 9/22（二）下午三點半止</li>
+            <li><strong>付款方式：</strong>僅接受『現金付款』</li>
+            <li><strong>取貨提醒：</strong>到貨當日，請大家自備保冷袋，不再提供塑膠袋。</li>
+        </ul>
+    </div>
+
     <div>
-        <button class="tab-btn active" onclick="switchTab('order')">線上訂購</button>
-        <button class="tab-btn" onclick="switchTab('query')">查個人金額 / 修改訂單</button>
+        <button class="tab-btn active" onclick="switchTab('order')">線上訂購 (剩餘追加)</button>
+        <button class="tab-btn" onclick="switchTab('query')">查個人應付金額與明細</button>
     </div>
 
     <!-- 頁籤一：線上訂購 -->
@@ -61,24 +94,24 @@
                 </tbody>
             </table>
 
-            <div class="total-box">目前試算總額：NT$ <span id="totalAmount">0</span></div>
+            <div class="total-box">試算追加總額：NT$ <span id="totalAmount">0</span></div>
 
             <div class="form-group">
                 <label>姓名 *</label>
                 <input type="text" id="name" required placeholder="例如：張小明">
             </div>
             <div class="form-group">
-                <label>自設密碼 * (用於未來修改訂單與查詢金額)</label>
-                <input type="password" id="password" required placeholder="設定 4 位數以上密碼">
+                <label>自設密碼 * (用於查詢個人金額)</label>
+                <input type="password" id="password" required placeholder="請輸入 4 位數以上密碼">
             </div>
 
-            <button type="submit" class="btn" id="submitBtn">送出訂單</button>
+            <button type="submit" class="btn" id="submitBtn">送出追加訂單</button>
         </form>
     </div>
 
-    <!-- 頁籤二：查詢與改單 -->
+    <!-- 頁籤二：查個人金額與明細 -->
     <div id="tab-query" class="tab-content" style="display:none;">
-        <h3>個人金額與修改訂單</h3>
+        <h3>查個人應付金額與出貨明細</h3>
         <div class="form-group">
             <label>訂購人姓名</label>
             <input type="text" id="q-name" placeholder="請輸入姓名">
@@ -87,11 +120,11 @@
             <label>自設密碼</label>
             <input type="password" id="q-password" placeholder="請輸入密碼">
         </div>
-        <button type="button" class="btn btn-secondary" id="btnQuery">驗證並載入訂單</button>
+        <button type="button" class="btn btn-secondary" id="btnQuery">驗證並查詢明細</button>
 
         <div id="queryResult" style="margin-top:20px; display:none;">
             <hr>
-            <h4>您的訂購紀錄（可直接加減數量進行改單）：</h4>
+            <div class="lock-notice">🔒 目前已進入鎖單出貨階段，以下為您的最終訂購出貨明細：</div>
             
             <table>
                 <thead>
@@ -99,13 +132,13 @@
                         <th>品名 / 規格</th>
                         <th style="width: 80px;">單價</th>
                         <th style="width: 80px;">訂購數量</th>
+                        <th style="width: 90px;">小計</th>
                     </tr>
                 </thead>
                 <tbody id="editProductList"></tbody>
             </table>
 
             <div class="total-box">個人應付總金額：NT$ <span id="myTotal">0</span></div>
-            <button type="button" class="btn" id="btnSaveEdit">儲存 / 覆蓋修改訂單</button>
         </div>
     </div>
 </div>
@@ -216,12 +249,12 @@
         });
 
         if(orderItems.length === 0) {
-            alert('請至少選擇一項商品的數量！');
+            alert('請至少選擇一項商品的追加數量！');
             return;
         }
 
         btn.disabled = true;
-        btn.textContent = '訂單處理中...';
+        btn.textContent = '追加處理中...';
 
         fetch(GAS_URL, {
             method: 'POST',
@@ -235,22 +268,22 @@
         .then(res => res.json())
         .then(data => {
             if(data.status === 'success') {
-                alert('訂單已成功送出與累加！');
+                alert('追加成功！訂單已累加。');
                 location.reload();
             } else {
                 alert('失敗：' + data.message);
                 btn.disabled = false;
-                btn.textContent = '送出訂單';
+                btn.textContent = '送出追加訂單';
             }
         })
         .catch(err => {
             alert('連線異常，請重試。');
             btn.disabled = false;
-            btn.textContent = '送出訂單';
+            btn.textContent = '送出追加訂單';
         });
     });
 
-    // 驗證並載入個人改單頁面（包含完售防呆與鎖定）
+    // 驗證並載入個人純明細頁面（修正：包含私下追加或未上架商品）
     document.getElementById('btnQuery').addEventListener('click', function() {
         const name = document.getElementById('q-name').value.trim();
         const password = document.getElementById('q-password').value.trim();
@@ -271,103 +304,51 @@
                 const userItems = data.userItems || {};
                 const list = document.getElementById('editProductList');
                 list.innerHTML = '';
+                let grandTotal = 0;
+                let hasOrderedAny = false;
 
-                globalProducts.forEach((item, index) => {
-                    if (item.isWebShow === false) return;
+                // 建立快速查詢字典
+                const prodMap = {};
+                globalProducts.forEach(p => { prodMap[p.name] = p; });
 
-                    const currentQty = userItems[item.name] || 0;
-                    const subInfo = item.spec || '-';
-                    const isSoldOut = item.stock <= 0;
+                // 遍歷該使用者所有訂購品項（不管是不是在架上）
+                Object.keys(userItems).forEach(itemName => {
+                    const currentQty = userItems[itemName] || 0;
+                    if (currentQty > 0) {
+                        hasOrderedAny = true;
+                        const prodInfo = prodMap[itemName] || {};
+                        const price = prodInfo.price || 0; // 若沒對應到商品表，則自訂價格或帶入預設值
+                        const subInfo = prodInfo.spec || '-';
+                        
+                        // 針對阿根廷魷魚4L特別比對單價 (以防商品清單沒有)
+                        const finalPrice = (itemName.includes("整尾阿根廷魷魚4L") && price === 0) ? 280 : price;
+                        const itemTotal = currentQty * finalPrice;
+                        grandTotal += itemTotal;
 
-                    let inputHTML = '';
-
-                    if (isSoldOut) {
-                        if (currentQty > 0) {
-                            // 情況 1：已完售，但原本有訂購 ➔ 只能改小或維持，max 鎖死為原本數量（無法追加）
-                            inputHTML = `<input type="number" class="qty-input edit-qty" data-index="${index}" min="0" max="${currentQty}" step="1" value="${currentQty}">`;
-                        } else {
-                            // 情況 2：已完售，且原本沒訂購 ➔ 直接鎖住（disabled）
-                            inputHTML = `<input type="number" class="qty-input edit-qty" data-index="${index}" value="0" disabled>`;
-                        }
-                    } else {
-                        // 情況 3：未完售 ➔ 正常可加減，最大上限為 (原本數量 + 剩餘庫存)
-                        const maxAllowed = currentQty + item.stock;
-                        inputHTML = `<input type="number" class="qty-input edit-qty" data-index="${index}" min="0" max="${maxAllowed}" step="1" value="${currentQty}">`;
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <div class="prod-title">${itemName}</div>
+                                <div class="prod-sub">${subInfo}</div>
+                            </td>
+                            <td class="price">NT$ ${finalPrice}</td>
+                            <td style="font-weight: bold; font-size: 1.1rem; text-align: center;">${currentQty}</td>
+                            <td style="font-weight: bold;">NT$ ${itemTotal.toLocaleString()}</td>
+                        `;
+                        list.appendChild(tr);
                     }
-
-                    const tr = document.createElement('tr');
-                    if (isSoldOut && currentQty === 0) tr.classList.add('disabled-row');
-
-                    tr.innerHTML = `
-                        <td>
-                            <div class="prod-title">${item.name} ${isSoldOut ? '<span class="sold-out">(已完售)</span>' : ''}</div>
-                            <div class="prod-sub">${subInfo}</div>
-                        </td>
-                        <td class="price">NT$ ${item.price}</td>
-                        <td>${inputHTML}</td>
-                    `;
-                    list.appendChild(tr);
                 });
 
+                if (!hasOrderedAny) {
+                    list.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">您目前尚無訂購任何品項。</td></tr>';
+                }
+
+                document.getElementById('myTotal').textContent = grandTotal.toLocaleString();
                 document.getElementById('queryResult').style.display = 'block';
-                bindCalcEvents('.edit-qty', 'myTotal');
-                
-                const firstInput = document.querySelector('.edit-qty:not([disabled])');
-                if(firstInput) firstInput.dispatchEvent(new Event('change'));
             })
             .catch(err => {
                 alert('驗證失敗，請確認網路連線。');
             });
-    });
-
-    // 覆蓋儲存修改後的訂單
-    document.getElementById('btnSaveEdit').addEventListener('click', function() {
-        const btn = document.getElementById('btnSaveEdit');
-        const name = document.getElementById('q-name').value.trim();
-        const password = document.getElementById('q-password').value.trim();
-        const inputs = document.querySelectorAll('.edit-qty');
-        let orderItems = [];
-
-        inputs.forEach(i => {
-            if (i.disabled) return; // 鎖住的品項跳過
-            const qty = parseInt(i.value) || 0;
-            const idx = i.getAttribute('data-index');
-            orderItems.push({
-                id: globalProducts[idx].name,
-                name: globalProducts[idx].name,
-                price: globalProducts[idx].price,
-                qty: qty
-            });
-        });
-
-        btn.disabled = true;
-        btn.textContent = '儲存中...';
-
-        fetch(GAS_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-                name: name,
-                password: password,
-                isOverwrite: true,
-                items: orderItems
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.status === 'success') {
-                alert('訂單修改成功！');
-                location.reload();
-            } else {
-                alert('修改失敗：' + data.message);
-                btn.disabled = false;
-                btn.textContent = '儲存 / 覆蓋修改訂單';
-            }
-        })
-        .catch(err => {
-            alert('系統連線異常，請再試一次。');
-            btn.disabled = false;
-            btn.textContent = '儲存 / 覆蓋修改訂單';
-        });
     });
 
     function switchTab(tab) {
