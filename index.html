@@ -248,7 +248,7 @@
                         <div class="special-rule">⚠️ 僅作登記（限量4箱/約36-40包），不提前收錢，須到貨現場秤重算錢並現場收現。</div>
                         ${buyerDetails}
                     </td>
-                    <td class="price">NT$ 470 / 公斤</td>
+                    <td class="price">NT$ 480 / 公斤</td>
                     <td>${isSoldOut ? '<span class="sold-out">完售</span>' : item.stock}</td>
                     <td>
                         <input type="number" class="qty-input order-qty" data-index="${index}" min="0" max="${item.stock}" step="1" value="0" ${isSoldOut ? 'disabled' : ''}>
@@ -403,7 +403,7 @@
                             itemTotalHtml = `NT$ ${itemTotal.toLocaleString()}`;
                         }
 
-                        const priceDisplay = isBeefRibs ? `NT$ 470 / 公斤` : `NT$ ${price}`;
+                        const priceDisplay = isBeefRibs ? `NT$ 480 / 公斤` : `NT$ ${price}`;
 
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
